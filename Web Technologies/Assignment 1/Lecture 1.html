@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 1 - Web Technologies</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(to right, #4D55CC, #7A73D1, #B5A8D5);
+            padding: 20px 50px;
+            border-bottom: 3px solid #0e0101;
+            color: white;
+            text-shadow: 2px 2px 10px rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo img {
+            height: 90px;
+        }
+
+        .title {
+            text-align: center;
+            flex-grow: 1;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .teacher-name {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .content {
+            width: 90%;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .box {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        h2 {
+            background: linear-gradient(to right, #211C84, #4D55CC);
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            transition: background 0.3s ease-in-out;
+        }
+
+        h2:hover {
+            background: linear-gradient(to right, #1a146e, #3a49c4);
+        }
+
+        h3 {
+            color: #4D55CC;
+            margin-top: 15px;
+            position: relative;
+            display: inline-block;
+        }
+
+        ul {
+            margin-left: 20px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            background: #333;
+            color: white;
+            margin-top: 30px;
+            transition: background 0.3s ease-in-out;
+        }
+
+        footer:hover {
+            background: #4D55CC;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="C:\Users\faiza\Documents\CUI.png"alt="Logo">
+        </div>
+        <div class="title">
+            <h1>Lecture 1: Overview of Web Platforms</h1>
+        </div>
+        <div class="teacher-name">
+            <p>Instructor:<br>Ma'am Yasmeen Jana</p>
+        </div>
+    </header>
+
+    <div class="content">
+        <div class="box">
+            <h2>📌 Overview of Web Platforms</h2>
+            <p>Web platforms are digital environments that allow users to develop, interact with, and deploy web applications.</p>
+            <h3>Why Are They Important?</h3>
+            <p>They provide a structured way for developers to create, manage, and deliver content efficiently over the internet.</p>
+            <h3>Key Components</h3>
+            <ul>
+                <li><strong>Infrastructure:</strong> Servers, databases, and networks supporting web applications.</li>
+                <li><strong>Development Tools:</strong> Languages (HTML, CSS, JavaScript), frameworks (React, Angular, Django).</li>
+                <li><strong>Content Management:</strong> Platforms like WordPress, Joomla, and Drupal for website creation.</li>
+                <li><strong>User Interface (UI):</strong> Elements users interact with (web pages, navigation menus, forms).</li>
+                <li><strong>APIs:</strong> Enable communication between different software systems.</li>
+                <li><strong>Security Features:</strong> Authentication, encryption, and access controls to protect data.</li>
+            </ul>
+        </div>
+
+        <div class="box">
+            <h2>📌 Web Communication Protocol - HTTP</h2>
+            <p>Hypertext Transfer Protocol (HTTP) is the foundation of communication on the web.</p>
+            <h3>How HTTP Works?</h3>
+            <p>HTTP follows a request-response model:</p>
+            <ul>
+                <li>Client (Browser) requests content.</li>
+                <li>Server processes the request and sends a response.</li>
+            </ul>
+            <h3>HTTP Methods</h3>
+            <ul>
+                <li>GET → Retrieve data.</li>
+                <li>POST → Submit data.</li>
+                <li>PUT/PATCH → Update data.</li>
+                <li>DELETE → Remove data.</li>
+            </ul>
+        </div>
+
+        <div class="box">
+            <h2>📌 Web Generations</h2>
+            <h3>Web 1.0 – Static Web (1990s)</h3>
+            <p>Read-only web with static pages.</p>
+            <h3>Web 2.0 – Social Web (2000s)</h3>
+            <p>Dynamic content, social networking, and user-generated data.</p>
+            <h3>Web 3.0 – Semantic Web (2010s – Present)</h3>
+            <p>AI-powered, machine-readable data.</p>
+        </div>
+
+        <div class="box">
+            <h2>📌 Standards & Constraints</h2>
+            <h3>Web Standards</h3>
+            <p>Defined by organizations like W3C and IETF to ensure compatibility and accessibility.</p>
+            <h3>Web Constraints</h3>
+            <ul>
+                <li>Browser & device compatibility.</li>
+                <li>Data privacy laws (GDPR, CCPA).</li>
+                <li>SEO (Search Engine Optimization).</li>
+            </ul>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 Faizan | Web Technologies | All Rights Reserved</p>
+    </footer>
+
+</body>
+</html>

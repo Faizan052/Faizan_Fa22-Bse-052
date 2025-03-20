@@ -1,0 +1,20 @@
+C:\Users\faiza\Desktop\Visual Programming\LAB 5\Task 4\bin\Debug\net8.0-windows\Task 4.exe
+C:\Users\faiza\Desktop\Visual Programming\LAB 5\Task 4\bin\Debug\net8.0-windows\Task 4.deps.json
+C:\Users\faiza\Desktop\Visual Programming\LAB 5\Task 4\bin\Debug\net8.0-windows\Task 4.runtimeconfig.json
+C:\Users\faiza\Desktop\Visual Programming\LAB 5\Task 4\bin\Debug\net8.0-windows\Task 4.dll
+C:\Users\faiza\Desktop\Visual Programming\LAB 5\Task 4\bin\Debug\net8.0-windows\Task 4.pdb
+C:\Users\faiza\Desktop\Visual Programming\LAB 5\Task 4\obj\Debug\net8.0-windows\MainWindow.g.cs
+C:\Users\faiza\Desktop\Visual Programming\LAB 5\Task 4\obj\Debug\net8.0-windows\App.g.cs
+C:\Users\faiza\Desktop\Visual Programming\LAB 5\Task 4\obj\Debug\net8.0-windows\Task 4_MarkupCompile.cache
+C:\Users\faiza\Desktop\Visual Programming\LAB 5\Task 4\obj\Debug\net8.0-windows\Task 4_MarkupCompile.lref
+C:\Users\faiza\Desktop\Visual Programming\LAB 5\Task 4\obj\Debug\net8.0-windows\MainWindow.baml
+C:\Users\faiza\Desktop\Visual Programming\LAB 5\Task 4\obj\Debug\net8.0-windows\Task 4.g.resources
+C:\Users\faiza\Desktop\Visual Programming\LAB 5\Task 4\obj\Debug\net8.0-windows\Task 4.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\faiza\Desktop\Visual Programming\LAB 5\Task 4\obj\Debug\net8.0-windows\Task 4.AssemblyInfoInputs.cache
+C:\Users\faiza\Desktop\Visual Programming\LAB 5\Task 4\obj\Debug\net8.0-windows\Task 4.AssemblyInfo.cs
+C:\Users\faiza\Desktop\Visual Programming\LAB 5\Task 4\obj\Debug\net8.0-windows\Task 4.csproj.CoreCompileInputs.cache
+C:\Users\faiza\Desktop\Visual Programming\LAB 5\Task 4\obj\Debug\net8.0-windows\Task 4.dll
+C:\Users\faiza\Desktop\Visual Programming\LAB 5\Task 4\obj\Debug\net8.0-windows\refint\Task 4.dll
+C:\Users\faiza\Desktop\Visual Programming\LAB 5\Task 4\obj\Debug\net8.0-windows\Task 4.pdb
+C:\Users\faiza\Desktop\Visual Programming\LAB 5\Task 4\obj\Debug\net8.0-windows\Task 4.genruntimeconfig.cache
+C:\Users\faiza\Desktop\Visual Programming\LAB 5\Task 4\obj\Debug\net8.0-windows\ref\Task 4.dll

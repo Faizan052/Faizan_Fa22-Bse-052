@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Sign-Up</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #211C84, #4D55CC);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .form-container {
+            width: 500px; /* Wider form */
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            color: black; /* Fix text color */
+        }
+
+        h2 {
+            background: linear-gradient(to right, #211C84, #4D55CC);
+            color: white;
+            padding: 14px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 12px;
+            text-align: left;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .gender-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .gender-group label {
+            font-weight: normal;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(to right, #211C84, #4D55CC);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            margin-top: 20px;
+            transition: 0.3s ease-in-out;
+        }
+
+        button:hover {
+            background: linear-gradient(to right, #1a146e, #3a49c4);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Student Sign-Up</h2>
+        
+        <!-- Redirects directly to Main Page.html -->
+        <form action="file:///C:/Users/faiza/Desktop/HTML/Assignment%201/Main%20Page.html" method="get">
+            
+            <label for="student-name">Student Name</label>
+            <input type="text" id="student-name" name="student-name" required>
+
+            <label for="reg-no">Registration No</label>
+            <input type="text" id="reg-no" name="reg-no" required>
+
+            <label for="section">Section</label>
+            <select id="section" name="section" required>
+                <option value="">Select Section</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+            </select>
+
+            <label for="subject">Subject Name</label>
+            <input type="text" id="subject" name="subject" required>
+
+            <label>Gender</label>
+            <div class="gender-group">
+                <label><input type="radio" name="gender" value="Male" required> Male</label>
+                <label><input type="radio" name="gender" value="Female" required> Female</label>
+            </div>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+</body>
+</html>

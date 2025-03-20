@@ -1,0 +1,149 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\faiza\\Desktop\\Visual Programming\\LAB 5\\Task3\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{88C96743-2D66-4D97-B649-0880976428AB}|..\\Activity1\\Activity1.csproj|c:\\users\\faiza\\desktop\\visual programming\\lab 5\\activity1\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{21193733-0425-4CFE-9CEF-01AE3E7234FB}|..\\Task1\\Task1.csproj|c:\\users\\faiza\\desktop\\visual programming\\lab 5\\task1\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{88C96743-2D66-4D97-B649-0880976428AB}|..\\Activity1\\Activity1.csproj|c:\\users\\faiza\\desktop\\visual programming\\lab 5\\activity1\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0708B604-20D1-4C9F-A25D-2C85D84D3900}|..\\Task 4\\Task 4.csproj|c:\\users\\faiza\\desktop\\visual programming\\lab 5\\task 4\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0708B604-20D1-4C9F-A25D-2C85D84D3900}|..\\Task 4\\Task 4.csproj|c:\\users\\faiza\\desktop\\visual programming\\lab 5\\task 4\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{61E4315D-D73C-4082-83A2-369D02B0D24F}|..\\Task2\\Task2.csproj|c:\\users\\faiza\\desktop\\visual programming\\lab 5\\task2\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{21193733-0425-4CFE-9CEF-01AE3E7234FB}|..\\Task1\\Task1.csproj|c:\\users\\faiza\\desktop\\visual programming\\lab 5\\task1\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{61E4315D-D73C-4082-83A2-369D02B0D24F}|..\\Task2\\Task2.csproj|c:\\users\\faiza\\desktop\\visual programming\\lab 5\\task2\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 1,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedHeight": 25,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\faiza\\Desktop\\Visual Programming\\LAB 5\\Task1\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "..\\Task1\\MainWindow.xaml.cs",
+              "ToolTip": "C:\\Users\\faiza\\Desktop\\Visual Programming\\LAB 5\\Task1\\MainWindow.xaml.cs",
+              "RelativeToolTip": "..\\Task1\\MainWindow.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-19T05:17:45.785Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MainWindow.xaml",
+              "DocumentMoniker": "C:\\Users\\faiza\\Desktop\\Visual Programming\\LAB 5\\Activity1\\MainWindow.xaml",
+              "RelativeDocumentMoniker": "..\\Activity1\\MainWindow.xaml",
+              "ToolTip": "C:\\Users\\faiza\\Desktop\\Visual Programming\\LAB 5\\Activity1\\MainWindow.xaml",
+              "RelativeToolTip": "..\\Activity1\\MainWindow.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-03-19T06:01:18.529Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\faiza\\Desktop\\Visual Programming\\LAB 5\\Activity1\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "..\\Activity1\\MainWindow.xaml.cs",
+              "ToolTip": "C:\\Users\\faiza\\Desktop\\Visual Programming\\LAB 5\\Activity1\\MainWindow.xaml.cs",
+              "RelativeToolTip": "..\\Activity1\\MainWindow.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-19T06:01:17.871Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "MainWindow.xaml",
+              "DocumentMoniker": "C:\\Users\\faiza\\Desktop\\Visual Programming\\LAB 5\\Task 4\\MainWindow.xaml",
+              "RelativeDocumentMoniker": "..\\Task 4\\MainWindow.xaml",
+              "ToolTip": "C:\\Users\\faiza\\Desktop\\Visual Programming\\LAB 5\\Task 4\\MainWindow.xaml",
+              "RelativeToolTip": "..\\Task 4\\MainWindow.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-03-19T05:47:34.604Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\faiza\\Desktop\\Visual Programming\\LAB 5\\Task 4\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "..\\Task 4\\MainWindow.xaml.cs",
+              "ToolTip": "C:\\Users\\faiza\\Desktop\\Visual Programming\\LAB 5\\Task 4\\MainWindow.xaml.cs",
+              "RelativeToolTip": "..\\Task 4\\MainWindow.xaml.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAA4AAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-19T05:47:34.049Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "MainWindow.xaml",
+              "DocumentMoniker": "C:\\Users\\faiza\\Desktop\\Visual Programming\\LAB 5\\Task2\\MainWindow.xaml",
+              "RelativeDocumentMoniker": "..\\Task2\\MainWindow.xaml",
+              "ToolTip": "C:\\Users\\faiza\\Desktop\\Visual Programming\\LAB 5\\Task2\\MainWindow.xaml",
+              "RelativeToolTip": "..\\Task2\\MainWindow.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-03-19T05:26:02.833Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\faiza\\Desktop\\Visual Programming\\LAB 5\\Task2\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "..\\Task2\\MainWindow.xaml.cs",
+              "ToolTip": "C:\\Users\\faiza\\Desktop\\Visual Programming\\LAB 5\\Task2\\MainWindow.xaml.cs",
+              "RelativeToolTip": "..\\Task2\\MainWindow.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-19T05:26:02.363Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "MainWindow.xaml",
+              "DocumentMoniker": "C:\\Users\\faiza\\Desktop\\Visual Programming\\LAB 5\\Task1\\MainWindow.xaml",
+              "RelativeDocumentMoniker": "..\\Task1\\MainWindow.xaml",
+              "ToolTip": "C:\\Users\\faiza\\Desktop\\Visual Programming\\LAB 5\\Task1\\MainWindow.xaml",
+              "RelativeToolTip": "..\\Task1\\MainWindow.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-03-19T05:17:46.299Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

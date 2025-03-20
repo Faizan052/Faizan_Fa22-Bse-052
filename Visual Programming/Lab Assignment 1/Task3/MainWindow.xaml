@@ -1,0 +1,35 @@
+﻿<Window x:Class="Task3.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="TASK 3" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100*"/>
+            <RowDefinition Height="117*"/>
+        </Grid.RowDefinitions>
+        <Label Content="Student Registration form" HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
+
+        <Label Content="Enter Name " HorizontalAlignment="Left" Margin="22,52,0,0" VerticalAlignment="Top" FontSize="16"/>
+        <TextBox x:Name="NameInput" HorizontalAlignment="Left" Margin="162,60,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" FontSize="16"/>
+
+        <Label Content="Password " HorizontalAlignment="Left" Margin="22,100,0,0" VerticalAlignment="Top" FontSize="16"/>
+        <TextBox x:Name="PasswordInput" HorizontalAlignment="Left" Margin="162,104,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" FontSize="16"/>
+
+        <Label Content="Role" HorizontalAlignment="Left" Margin="22,159,0,0" VerticalAlignment="Top" FontSize="16"/>
+        <ComboBox x:Name="Role" HorizontalAlignment="Left" Margin="169,161,0,0" VerticalAlignment="Top" Width="106" Height="27">
+            <ComboBoxItem Content="Employee" />
+            <ComboBoxItem Content="Teacher" />
+            <ComboBoxItem Content="Student" />
+            <ComboBoxItem Content="Faculty" />
+        </ComboBox>
+
+        <Label Content="Applying Degree" HorizontalAlignment="Left" Margin="13,12,0,0" VerticalAlignment="Top" FontSize="16" Grid.Row="1"/>
+        <ComboBox x:Name="Degree" HorizontalAlignment="Left" Margin="169,16,0,0" VerticalAlignment="Top" Width="106" Height="27" Grid.Row="1">
+            <ComboBoxItem Content="Software Engineering" />
+            <ComboBoxItem Content="Computer Sciences" />
+            <ComboBoxItem Content="Biotechnology" />
+        </ComboBox>
+
+        <Button x:Name="SubmitButton" Content="Submit" HorizontalAlignment="Left" Margin="279,94,0,0" Grid.Row="1" VerticalAlignment="Top" Height="37" Width="70" BorderBrush="Azure"/>
+    </Grid>
+</Window>

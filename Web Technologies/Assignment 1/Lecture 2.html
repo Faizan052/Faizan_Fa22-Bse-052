@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 2 - Web Applications & Architectures</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(to right, #4D55CC, #7A73D1, #B5A8D5);
+            padding: 15px 40px;
+            border-bottom: 3px solid #0e0101;
+            color: white;
+            text-shadow: 2px 2px 10px rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo img {
+            height: 90px;
+        }
+
+        .title {
+            text-align: center;
+            flex-grow: 1;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .teacher-name {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .content {
+            width: 90%;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .box {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        h2 {
+            background: linear-gradient(to right, #211C84, #4D55CC);
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            transition: background 0.3s ease-in-out;
+        }
+
+        h2:hover {
+            background: linear-gradient(to right, #1a146e, #3a49c4);
+        }
+
+        h3 {
+            color: #4D55CC;
+            margin-top: 15px;
+            position: relative;
+            display: inline-block;
+        }
+
+        ul {
+            margin-left: 20px;
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            background: #333;
+            color: white;
+            margin-top: 30px;
+            transition: background 0.3s ease-in-out;
+        }
+
+        footer:hover {
+            background: #4D55CC;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="C:\Users\faiza\Documents\CUI.png" alt="Logo">
+        </div>
+        <div class="title">
+            <h1>Lecture 2: Web Applications & Architectures</h1>
+        </div>
+        <div class="teacher-name">
+            <p>Instructor:<br>Ma'am Yasmeen Jana</p>
+        </div>
+    </header>
+
+    <div class="content">
+        <div class="box">
+            <h2>📌 Categories of Web Applications</h2>
+            <h3>1️⃣ Document-Centric Web Applications</h3>
+            <p>Focuses on creating, managing, and sharing documents online with real-time collaboration.</p>
+            <ul>
+                <li>Real-time editing, cloud storage, and version control.</li>
+                <li>Examples: Google Docs, Microsoft Office Online, Dropbox Paper.</li>
+            </ul>
+            <h3>2️⃣ Social Web Applications</h3>
+            <p>Enable user interaction, content sharing, and social networking.</p>
+            <ul>
+                <li>User profiles, messaging, feeds, notifications.</li>
+                <li>Examples: Facebook, Twitter, Instagram, LinkedIn.</li>
+            </ul>
+            <h3>3️⃣ Semantic Web Applications</h3>
+            <p>Uses structured data for enhanced search and intelligent automation.</p>
+            <ul>
+                <li>Examples: Google Knowledge Graph, Wolfram Alpha, Schema.org.</li>
+            </ul>
+        </div>
+
+        <div class="box">
+            <h2>📌 Web Architectures</h2>
+            <h3>🔹 Layered Architecture</h3>
+            <p>Separates concerns into Presentation, Business Logic, and Data Layer.</p>
+            <h3>🔹 One-Tier Architecture</h3>
+            <p>All components exist in a single system, common in desktop applications.</p>
+            <h3>🔹 Two-Tier Architecture</h3>
+            <p>Client-Server model where the UI is separate from the database.</p>
+            <h3>🔹 Three-Tier Architecture</h3>
+            <p>Uses Presentation, Logic, and Database layers for better scalability.</p>
+            <h3>🔹 N-Layered Architecture</h3>
+            <p>Advanced version of three-tier, improving security and flexibility.</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 Faizan | Web Technologies | All Rights Reserved</p>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 4 - Tables, Div, Span, and Layout Design</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(to right, #4D55CC, #7A73D1, #B5A8D5);
+            padding: 15px 40px;
+            border-bottom: 3px solid #0e0101;
+            color: white;
+            text-shadow: 2px 2px 10px rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo img {
+            height: 90px;
+        }
+
+        .title {
+            text-align: center;
+            flex-grow: 1;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .teacher-name {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .content {
+            width: 90%;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .box {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        h2 {
+            background: linear-gradient(to right, #211C84, #4D55CC);
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            transition: background 0.3s ease-in-out;
+        }
+
+        h2:hover {
+            background: linear-gradient(to right, #1a146e, #3a49c4);
+        }
+
+        h3 {
+            color: #4D55CC;
+            margin-top: 15px;
+            position: relative;
+            display: inline-block;
+        }
+
+        ul {
+            margin-left: 20px;
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            background: #333;
+            color: white;
+            margin-top: 30px;
+            transition: background 0.3s ease-in-out;
+        }
+
+        footer:hover {
+            background: #4D55CC;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="C:\Users\faiza\Documents\CUI.png"alt="Logo">
+        </div>
+        <div class="title">
+            <h1>Lecture 4: Tables, Div, Span, and Layout Design</h1>
+        </div>
+        <div class="teacher-name">
+            <p>Instructor:<br>Ma'am Yasmeen Jana</p>
+        </div>
+    </header>
+
+    <div class="content">
+        <div class="box">
+            <h2>📌 HTML Tables</h2>
+            <p>Tables are used in HTML to display information in a structured manner using rows and columns.</p>
+            <p>They help organize data efficiently and are commonly used in pricing lists, schedules, reports, and databases.</p>
+            <p>A table consists of table rows (&lt;tr&gt;), table headers (&lt;th&gt;), and table data cells (&lt;td&gt;).</p>
+            <h3>Example:</h3>
+            <table border="1" cellpadding="5" cellspacing="5">
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                </tr>
+                <tr>
+                    <td>Smartphone</td>
+                    <td>$500</td>
+                    <td>Available</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="box">
+            <h2>📌 Div Element</h2>
+            <p>The &lt;div&gt; element is a block-level container that is used to group elements together and apply CSS styles.</p>
+            <p>It helps structure the page layout, allowing better content management and improved responsiveness.</p>
+            <h3>Example:</h3>
+            <div style="border: 1px solid black; padding: 10px;">
+                <h3>Product Details</h3>
+                <p>This section contains product information inside a styled div.</p>
+            </div>
+        </div>
+
+        <div class="box">
+            <h2>📌 Span Element</h2>
+            <p>The &lt;span&gt; element is an inline container used for styling specific portions of text.</p>
+            <p>Unlike &lt;div&gt;, which is block-level, &lt;span&gt; does not create a new line and is used within text elements.</p>
+            <h3>Example:</h3>
+            <p>The price is <span style="color: green; font-weight: bold;">$500</span> and is on sale!</p>
+        </div>
+
+        <div class="box">
+            <h2>📌 HTML Layout Design</h2>
+            <p>Web layout design is essential for creating visually appealing and user-friendly websites.</p>
+            <p>HTML layout uses elements like &lt;header&gt;, &lt;nav&gt;, &lt;section&gt;, &lt;article&gt;, &lt;aside&gt;, &lt;footer&gt;, and CSS for better structure.</p>
+            <h3>Example:</h3>
+            <pre>
+                &lt;header&gt;Website Header&lt;/header&gt;
+                &lt;nav&gt;Navigation Menu&lt;/nav&gt;
+                &lt;main&gt;
+                    &lt;section&gt;Main Content&lt;/section&gt;
+                    &lt;aside&gt;Sidebar&lt;/aside&gt;
+                &lt;/main&gt;
+                &lt;footer&gt;Website Footer&lt;/footer&gt;
+            </pre>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 Faizan | Web Technologies | All Rights Reserved</p>
+    </footer>
+
+</body>
+</html>
