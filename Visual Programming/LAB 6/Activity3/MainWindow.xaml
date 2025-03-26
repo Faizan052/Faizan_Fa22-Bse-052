@@ -1,0 +1,22 @@
+﻿<Window x:Class="WPFStyles.Activity3"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Activity 3" Height="300" Width="400" Background="Aqua">
+
+    <Window.Resources>
+        <!-- Explicit Style (applied only when referenced) -->
+        <Style x:Key="TitleText" TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="FontFamily" Value="Comic Sans MS"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <StackPanel VerticalAlignment="Center">
+            <TextBlock Style="{StaticResource TitleText}">Styled with Explicit Style</TextBlock>
+            <TextBlock Name="textblock1">This will be styled programmatically.</TextBlock>
+            <Button Click="ApplyStyle_Click" Width="200" Height="30" Margin="10">Apply Style Programmatically</Button>
+        </StackPanel>
+    </Grid>
+</Window>

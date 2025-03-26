@@ -1,0 +1,15 @@
+﻿<Window x:Class="WPFStyles.Activity1"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Activity 1" Height="500" Width="700" Background="Cyan">
+    <Window.Resources>
+        <Style x:Key="Header1" TargetType="TextBlock" >
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="ExtraBold" />
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <TextBlock Text="Styled Header" Style="{StaticResource Header1}" 
+                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    </Grid>
+</Window>
