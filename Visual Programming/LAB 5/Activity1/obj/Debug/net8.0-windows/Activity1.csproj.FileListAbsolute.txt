@@ -1,4 +1,0 @@
-C:\Users\faiza\Desktop\Visual Programming\LAB 5\Activity1\obj\Debug\net8.0-windows\MainWindow.g.cs
-C:\Users\faiza\Desktop\Visual Programming\LAB 5\Activity1\obj\Debug\net8.0-windows\App.g.cs
-C:\Users\faiza\Desktop\Visual Programming\LAB 5\Activity1\obj\Debug\net8.0-windows\Activity1_MarkupCompile.cache
-C:\Users\faiza\Desktop\Visual Programming\LAB 5\Activity1\obj\Debug\net8.0-windows\Activity1_MarkupCompile.lref
