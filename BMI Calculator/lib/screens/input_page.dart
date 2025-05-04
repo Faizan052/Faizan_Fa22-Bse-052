@@ -7,29 +7,39 @@ class BMICalculator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
+      home: InputPage(),
+    );
+  }
+}
+
+class InputPage extends StatefulWidget {
+  @override
+  _InputPageState createState() => _InputPageState();
+}
+
+class _InputPageState extends State<InputPage> {
+  bool isMaleSelected = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('BMI Calculator'),
         backgroundColor: Color(0xFF0A0E21),
-        appBar: AppBar(
-          title: Text('BMI Calculator'),
-          backgroundColor: Color(0xFF0A0E21),
-        ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(
-              FontAwesomeIcons.mars,
-              size: 80.0,
-              color: Colors.white,
-            ),
-            SizedBox(height: 15.0),
-            Text(
-              'MALE',
-              style: TextStyle(
-                fontSize: 18.0,
-                color: Color(0xFF8D8E98),
-              ),
-            ),
-          ],
+      ),
+      backgroundColor: Color(0xFF0A0E21),
+      body: GestureDetector(
+        onTap: () {
+          setState(() {
+            isMaleSelected = !isMaleSelected;
+          });
+        },
+        child: Center(
+          child: Icon(
+            isMaleSelected ? FontAwesomeIcons.mars : FontAwesomeIcons.venus,
+            size: 100.0,
+            color: Colors.white,
+          ),
         ),
       ),
     );
