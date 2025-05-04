@@ -108,3 +108,59 @@ class _InputPageState extends State<InputPage> {
     );
   }
 }
+// ... [Previous code]
+
+class _InputPageState extends State<InputPage> {
+  // ... [Previous variables]
+  int height = 180;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // ... [AppBar and other widgets]
+      body: Column(
+        children: [
+          // ... [Gender selection row]
+          Expanded(
+            child: Container(
+              color: Color(0xFF1D1E33),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('HEIGHT', style: kLabelTextStyle),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        height.toString(),
+                        style: TextStyle(
+                          fontSize: 50.0,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(' cm', style: kLabelTextStyle),
+                    ],
+                  ),
+                  Slider(
+                    value: height.toDouble(),
+                    min: 120.0,
+                    max: 220.0,
+                    activeColor: Colors.white,
+                    inactiveColor: Color(0xFF8D8E98),
+                    onChanged: (double newValue) {
+                      setState(() {
+                        height = newValue.round();
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // ... [Other widgets]
+        ],
+      ),
+    );
+  }
+}
