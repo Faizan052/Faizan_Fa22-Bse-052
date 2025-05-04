@@ -7,7 +7,7 @@ const kBottomContainerColor = Color(0xFFEB1555);
 
 const kLabelTextStyle = TextStyle(
   fontSize: 18.0,
-  color: Color(0xFF8D8E98),
+  color: Colors.white70,
 );
 
 const kNumberTextStyle = TextStyle(
@@ -21,12 +21,12 @@ const kLargeButtonTextStyle = TextStyle(
 );
 
 const kTitleTextStyle = TextStyle(
-  fontSize: 50.0,
+  fontSize: 45.0,
   fontWeight: FontWeight.bold,
 );
 
 const kResultTextStyle = TextStyle(
-  color: Color(0xFF24D876),
+  color: Colors.greenAccent,
   fontSize: 22.0,
   fontWeight: FontWeight.bold,
 );

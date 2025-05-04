@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import '../constants.dart';
 import '../components/reusable_card.dart';
+import '../constants.dart';
 import '../components/bottom_button.dart';
 
 class ResultsPage extends StatelessWidget {
-  final String bmiResult;
-  final String resultText;
-  final String interpretation;
-
   ResultsPage(
       {required this.bmiResult,
         required this.resultText,
         required this.interpretation});
+
+  final String bmiResult;
+  final String resultText;
+  final String interpretation;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class ResultsPage extends StatelessWidget {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
+        children: <Widget>[
           Expanded(
             child: Container(
               padding: EdgeInsets.all(15.0),
@@ -35,9 +35,15 @@ class ResultsPage extends StatelessWidget {
               cardChild: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(resultText.toUpperCase(), style: kResultTextStyle),
-                  Text(bmiResult, style: kBMITextStyle),
+                children: <Widget>[
+                  Text(
+                    resultText.toUpperCase(),
+                    style: kResultTextStyle,
+                  ),
+                  Text(
+                    bmiResult,
+                    style: kBMITextStyle,
+                  ),
                   Text(
                     interpretation,
                     textAlign: TextAlign.center,
