@@ -245,3 +245,15 @@ class _InputPageState extends State<InputPage> {
     );
   }
 }
+// ... [Within the calculate button's onTap]
+
+onTap: () {
+Navigator.push(
+context,
+MaterialPageRoute(
+builder: (context) => ResultPage(
+bmiResult: calculateBMI(),
+),
+),
+);
+},
