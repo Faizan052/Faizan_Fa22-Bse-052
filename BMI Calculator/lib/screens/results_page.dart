@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
+import '../constants.dart';
+import '../components/reusable_card.dart';
+import '../components/bottom_button.dart';
 
-class ResultPage extends StatelessWidget {
+class ResultsPage extends StatelessWidget {
   final String bmiResult;
   final String resultText;
   final String interpretation;
 
-  ResultPage({
-    required this.bmiResult,
-    required this.resultText,
-    required this.interpretation,
-  });
+  ResultsPage(
+      {required this.bmiResult,
+        required this.resultText,
+        required this.interpretation});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('BMI Result'),
-        backgroundColor: Color(0xFF0A0E21),
-      ),
-      backgroundColor: Color(0xFF0A0E21),
+      appBar: AppBar(title: Text('BMI RESULT')),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -27,75 +25,33 @@ class ResultPage extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.all(15.0),
               alignment: Alignment.bottomLeft,
-              child: Text(
-                'Your Result',
-                style: TextStyle(
-                  fontSize: 50.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
+              child: Text('Your Result', style: kTitleTextStyle),
             ),
           ),
           Expanded(
             flex: 5,
-            child: Container(
-              margin: EdgeInsets.all(15.0),
-              decoration: BoxDecoration(
-                color: Color(0xFF1D1E33),
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Column(
+            child: ReusableCard(
+              color: kActiveCardColor,
+              cardChild: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    resultText.toUpperCase(),
-                    style: TextStyle(
-                      color: Colors.green,
-                      fontSize: 22.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    bmiResult,
-                    style: TextStyle(
-                      fontSize: 100.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+                  Text(resultText.toUpperCase(), style: kResultTextStyle),
+                  Text(bmiResult, style: kBMITextStyle),
                   Text(
                     interpretation,
-                    style: TextStyle(
-                      fontSize: 22.0,
-                      color: Colors.white,
-                    ),
                     textAlign: TextAlign.center,
+                    style: kBodyTextStyle,
                   ),
                 ],
               ),
             ),
           ),
-          GestureDetector(
+          BottomButton(
+            buttonTitle: 'RE-CALCULATE',
             onTap: () {
               Navigator.pop(context);
             },
-            child: Container(
-              child: Center(
-                child: Text(
-                  'RE-CALCULATE',
-                  style: TextStyle(
-                    fontSize: 25.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              color: Colors.pink,
-              margin: EdgeInsets.only(top: 10.0),
-              width: double.infinity,
-              height: 80.0,
-            ),
           ),
         ],
       ),
