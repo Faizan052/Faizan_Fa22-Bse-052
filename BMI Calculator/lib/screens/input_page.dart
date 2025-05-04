@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-
-const bottomContainerHeight = 80.0;
-const activeCardColor = Color(0xFF1D1E33);
-const bottomContainerColor = Color(0xFFEB1555);
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 void main() => runApp(BMICalculator());
 
@@ -17,21 +14,20 @@ class BMICalculator extends StatelessWidget {
           backgroundColor: Color(0xFF0A0E21),
         ),
         body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Expanded(
-              child: Container(
-                margin: EdgeInsets.all(15.0),
-                decoration: BoxDecoration(
-                  color: activeCardColor,
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-              ),
+            Icon(
+              FontAwesomeIcons.mars,
+              size: 80.0,
+              color: Colors.white,
             ),
-            Container(
-              color: bottomContainerColor,
-              margin: EdgeInsets.only(top: 10.0),
-              width: double.infinity,
-              height: bottomContainerHeight,
+            SizedBox(height: 15.0),
+            Text(
+              'MALE',
+              style: TextStyle(
+                fontSize: 18.0,
+                color: Color(0xFF8D8E98),
+              ),
             ),
           ],
         ),
