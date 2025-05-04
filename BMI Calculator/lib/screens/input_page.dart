@@ -64,3 +64,46 @@ class _InputPageState extends State<InputPage> {
     );
   }
 }
+class _InputPageState extends State<InputPage> {
+  Gender? selectedGender;
+
+  Widget buildGenderCard(Gender gender, IconData icon) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            selectedGender = gender;
+          });
+        },
+        child: Container(
+          color: selectedGender == gender ? Colors.blue : Color(0xFF1D1E33),
+          child: Center(
+            child: Icon(
+              icon,
+              size: 80.0,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // ... [AppBar and other widgets]
+      body: Column(
+        children: [
+          Row(
+            children: [
+              buildGenderCard(Gender.male, FontAwesomeIcons.mars),
+              buildGenderCard(Gender.female, FontAwesomeIcons.venus),
+            ],
+          ),
+          // ... [Other widgets]
+        ],
+      ),
+    );
+  }
+}
