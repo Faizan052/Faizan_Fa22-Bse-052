@@ -257,3 +257,13 @@ bmiResult: calculateBMI(),
 ),
 );
 },
+Navigator.push(
+context,
+MaterialPageRoute(
+builder: (context) => ResultPage(
+bmiResult: '22.5',
+resultText: 'Normal',
+interpretation: 'You have a normal body weight. Good job!',
+),
+),
+);
