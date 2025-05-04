@@ -164,10 +164,10 @@ class _InputPageState extends State<InputPage> {
     );
   }
 }
-// 
+
 
 class _InputPageState extends State<InputPage> {
-  // ... [Previous variables]
+
   int weight = 60;
   int age = 25;
 
