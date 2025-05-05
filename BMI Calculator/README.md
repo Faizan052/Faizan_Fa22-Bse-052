@@ -23,3 +23,9 @@ By completing this tutorial, you will gain hands-on experience with:
 ✅ ⚙️ Understand the difference between const and final in Dart and when to use each
 
 This project is a great opportunity to master Flutter’s capabilities while working on a real-world application that emphasizes both functionality and beautiful UI design.
+
+OUTPUTS:
+![1](https://github.com/user-attachments/assets/347e3ac4-9f63-43ba-992c-ddde80698c3a)
+![2](https://github.com/user-attachments/assets/5c9ca8b5-b31c-4d8a-ae09-71ec397ba929)
+
+
