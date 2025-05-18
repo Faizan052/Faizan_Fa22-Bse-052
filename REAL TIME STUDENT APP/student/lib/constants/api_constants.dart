@@ -1,0 +1,4 @@
+class ApiConstants {
+static const String supabaseUrl = https://emoevufpoeuqfychejgl.supabase.co; // Replace with your Supabase URL
+static const String supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtb2V2dWZwb2V1cWZ5Y2hlamdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc1NjQ4MTEsImV4cCI6MjA2MzE0MDgxMX0.RkmXgnC4zCogZFI5l8pJONd7TYJZxoTRJsujiGM6FuA'; // Replace with your Anon Key
+}
