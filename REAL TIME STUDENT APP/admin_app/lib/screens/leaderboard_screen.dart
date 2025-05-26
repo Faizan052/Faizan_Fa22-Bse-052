@@ -127,23 +127,28 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
 
   Widget _buildPodium() {
     final podiumGradients = [
-      const LinearGradient(
+      LinearGradient(
         colors: [Color(0xFF9333EA), Color(0xFF3B82F6)],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
+        stops: [0.1, 0.9],
       ),
-      const LinearGradient(
+      LinearGradient(
         colors: [Color(0xFFC0C0C0), Color(0xFF808080)],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
+        stops: [0.1, 0.9],
       ),
-      const LinearGradient(
+      LinearGradient(
         colors: [Color(0xFFCD7F32), Color(0xFF8C5523)],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
+        stops: [0.1, 0.9],
       ),
     ];
-    final heights = [160.0, 120.0, 100.0];
+    final heights = [180.0, 140.0, 120.0];
+    final iconSizes = [48.0, 36.0, 32.0];
+    final medals = ['🥇', '🥈', '🥉'];
 
     return AnimatedBuilder(
       animation: _mainController,
@@ -154,30 +159,46 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
             opacity: _fadeAnimation,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: List.generate(3, (index) {
                 if (index >= _leaderboardData.length) {
-                  return const SizedBox(width: 60);
+                  return const SizedBox(width: 80);
                 }
 
                 final student = _leaderboardData[index];
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    ShaderMask(
-                      blendMode: BlendMode.srcATop,
-                      shaderCallback: (bounds) {
-                        return LinearGradient(
-                          colors: [
-                            Colors.white,
-                            Colors.white.withOpacity(0.7),
-                          ],
-                          stops: const [0.5, 1.0],
-                        ).createShader(bounds);
-                      },
+                    // Medal icon
+                    Container(
+                      width: iconSizes[index],
+                      height: iconSizes[index],
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withOpacity(0.2),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.5),
+                          width: 2,
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          medals[index],
+                          style: TextStyle(fontSize: iconSizes[index] * 0.7),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    // Name
+                    Container(
+                      constraints: BoxConstraints(maxWidth: 80),
                       child: Text(
                         student['name'],
-                        style: const TextStyle(
-                          fontSize: 16,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                           shadows: [
@@ -191,30 +212,50 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                       ),
                     ),
                     const SizedBox(height: 8),
+                    // Podium
                     Container(
-                      width: 60,
+                      width: 80,
                       height: heights[index],
                       decoration: BoxDecoration(
                         gradient: podiumGradients[index],
-                        borderRadius: BorderRadius.circular(18),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(12),
+                          topRight: Radius.circular(12),
+                        ),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.3),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
+                            blurRadius: 15,
+                            offset: const Offset(0, 8),
                           ),
                         ],
                       ),
-                      child: Center(
-                        child: Text(
-                          '${index + 1}\n${student['completed']}',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '${student['completed']}',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 24,
+                              shadows: [
+                                Shadow(
+                                  blurRadius: 5,
+                                  color: Colors.black38,
+                                  offset: Offset(1, 1),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
+                          Text(
+                            'tasks',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.9),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -230,63 +271,93 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
   Widget _buildRankingList() {
     if (_leaderboardData.length <= 3) return const SizedBox();
 
-    return ListView.builder(
+    return ListView.separated(
       itemCount: _leaderboardData.length - 3,
+      separatorBuilder: (context, index) => Divider(
+        height: 1,
+        color: Colors.white.withOpacity(0.1),
+      ),
       itemBuilder: (context, index) {
         final student = _leaderboardData[index + 3];
         return FadeTransition(
           opacity: _fadeAnimation,
-          child: Container(
-            margin: const EdgeInsets.symmetric(vertical: 4),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(18),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 5,
-                  offset: const Offset(0, 2),
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: Offset(0.5, 0.0),
+              end: Offset.zero,
+            ).animate(
+              CurvedAnimation(
+                parent: _mainController,
+                curve: Interval(
+                  0.5 + (index * 0.1),
+                  1.0,
+                  curve: Curves.easeOut,
                 ),
-              ],
+              ),
             ),
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: Colors.transparent,
-                child: Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFF9333EA), Color(0xFF3B82F6)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.1),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.3),
+                        width: 1,
+                      ),
                     ),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${index + 4}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                    child: Center(
+                      child: Text(
+                        '${index + 4}',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
-              title: Text(
-                student['name'],
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 16,
-                ),
-              ),
-              trailing: Text(
-                '${student['completed']} completed',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
-                  fontSize: 14,
-                ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      student['name'],
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.2),
+                        width: 1,
+                      ),
+                    ),
+                    child: Text(
+                      '${student['completed']} tasks',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -298,6 +369,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final theme = Theme.of(context);
 
     return Scaffold(
       body: Stack(
@@ -310,16 +382,14 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                 width: double.infinity,
                 height: double.infinity,
                 decoration: BoxDecoration(
-                  gradient: SweepGradient(
+                  gradient: RadialGradient(
                     colors: [
-                      const Color(0xFF1E3A8A),
-                      const Color(0xFF6B21A8),
-                      const Color(0xFF1E3A8A),
+                      Color(0xFF1E3A8A).withOpacity(0.8),
+                      Color(0xFF6B21A8).withOpacity(0.8),
                     ],
-                    stops: const [0.0, 0.5, 1.0],
-                    center: Alignment.center,
-                    startAngle: 0.0,
-                    endAngle: _gradientAnimation.value * 2 * pi,
+                    center: Alignment.topLeft,
+                    radius: 1.5,
+                    stops: [0.0, 1.0],
                     transform: GradientRotation(_gradientAnimation.value * pi),
                   ),
                 ),
@@ -328,12 +398,14 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
           ),
           // Content
           SafeArea(
-            child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: _isLoading
-                  ? const Center(
+                  ? Center(
                 child: CircularProgressIndicator(
                   strokeWidth: 3,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                      Colors.white.withOpacity(0.8)),
                 ),
               )
                   : _error != null
@@ -355,115 +427,79 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                 ),
               )
                   : SingleChildScrollView(
-                child: ScaleTransition(
-                  scale: _scaleAnimation,
-                  child: FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: SlideTransition(
-                      position: _slideAnimation,
-                      child: Container(
-                        width: size.width * 0.9,
-                        padding: const EdgeInsets.all(28),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          color: Colors.white.withOpacity(0.08),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
-                              blurRadius: 30,
-                              spreadRadius: 5,
+                child: Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    // Title
+                    FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: SlideTransition(
+                        position: _slideAnimation,
+                        child: Column(
+                          children: [
+                            Text(
+                              'Student Leaderboard',
+                              style: theme.textTheme.headlineSmall?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 1.2,
+                                shadows: [
+                                  Shadow(
+                                    blurRadius: 10,
+                                    color: Colors.black38,
+                                    offset: Offset(2, 2),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Top performers based on completed tasks',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: Colors.white.withOpacity(0.8),
+                                letterSpacing: 0.5,
+                              ),
                             ),
                           ],
                         ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(30),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const SizedBox(height: 10),
-                                // Title
-                                ShaderMask(
-                                  blendMode: BlendMode.srcATop,
-                                  shaderCallback: (bounds) {
-                                    return LinearGradient(
-                                      colors: [
-                                        Colors.white,
-                                        Colors.white.withOpacity(0.7),
-                                      ],
-                                      stops: const [0.5, 1.0],
-                                    ).createShader(bounds);
-                                  },
-                                  child: const Text(
-                                    '🏆 Student Leaderboard',
-                                    style: TextStyle(
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.w800,
-                                      color: Colors.white,
-                                      letterSpacing: 1.5,
-                                      shadows: [
-                                        Shadow(
-                                          blurRadius: 10,
-                                          color: Colors.black38,
-                                          offset: Offset(2, 2),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 30),
-                                // Top 3 Performers
-                                Text(
-                                  '🏆 Top 3 Performers',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white.withOpacity(0.8),
-                                    shadows: [
-                                      Shadow(
-                                        blurRadius: 5,
-                                        color: Colors.black.withOpacity(0.3),
-                                        offset: const Offset(1, 1),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                _buildPodium(),
-                                const Divider(
-                                  height: 32,
-                                  color: Colors.white24,
-                                ),
-                                // Other Rankings
-                                Text(
-                                  '📋 Other Rankings',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white.withOpacity(0.8),
-                                    shadows: [
-                                      Shadow(
-                                        blurRadius: 5,
-                                        color: Colors.black.withOpacity(0.3),
-                                        offset: const Offset(1, 1),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                SizedBox(
-                                  height: size.height * 0.3,
-                                  child: _buildRankingList(),
-                                ),
-                                const SizedBox(height: 10),
-                              ],
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    // Podium
+                    _buildPodium(),
+                    const SizedBox(height: 32),
+                    // Rankings title
+                    FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Colors.white.withOpacity(0.2),
+                              width: 1,
                             ),
+                          ),
+                        ),
+                        child: Text(
+                          'All Rankings',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: Colors.white.withOpacity(0.9),
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 8),
+                    // Rankings list
+                    SizedBox(
+                      height: size.height * 0.35,
+                      child: _buildRankingList(),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
                 ),
               ),
             ),
