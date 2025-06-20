@@ -1,30 +1,36 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:complaint_guru/main.dart';
+import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../lib/main.dart';
+import '../lib/providers.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  setUpAll(() async {
+    // Initialize Supabase for testing
+    await Supabase.initialize(
+      url: 'https://vgxztzhbiljfgewfokkj.supabase.co', // Replace with your Supabase URL
+      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZneHp0emhiaWxqZmdld2Zva2tqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5NzYxNjAsImV4cCI6MjA2NTU1MjE2MH0.yBWDxXOH5qdOIezTnZLUFfy4tQ6PZ3X4uJE-sazM2DY', // Replace with your Supabase Anon Key
+    );
+  });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  testWidgets('SplashScreen displays CircularProgressIndicator', (WidgetTester tester) async {
+    // Build the app with providers
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => AuthProvider()),
+          ChangeNotifierProvider(create: (_) => ComplaintProvider()),
+        ],
+        child: const MyApp(),
+      ),
+    );
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // Allow async operations to complete
+    await tester.pumpAndSettle(const Duration(seconds: 1));
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Verify that the SplashScreen shows a CircularProgressIndicator
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.text('Smart Complaint System'), findsNothing); // Not on SplashScreen
   });
 }
