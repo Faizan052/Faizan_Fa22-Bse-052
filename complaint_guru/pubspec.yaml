@@ -2,7 +2,6 @@ name: complaint_guru
 description: "A Flutter-based Smart Complaint Management System."
 publish_to: 'none'
 version: 1.0.0+1
-
 environment:
   sdk: ^3.7.2
 
