@@ -47,6 +47,7 @@ class Complaint {
   final String advisorId;
   final String? hodId;
   final String status;
+  final DateTime createdAt;
 
   Complaint({
     required this.id,
@@ -59,6 +60,7 @@ class Complaint {
     required this.advisorId,
     this.hodId,
     required this.status,
+    required this.createdAt,
   });
 
   factory Complaint.fromJson(Map<String, dynamic> json) {
@@ -73,6 +75,7 @@ class Complaint {
       advisorId: json['advisor_id'] ?? '',
       hodId: json['hod_id'],
       status: json['status'] ?? 'Pending',
+      createdAt: DateTime.parse(json['created_at'] ?? DateTime.now().toIso8601String()),
     );
   }
 }
@@ -116,6 +119,35 @@ class Batch {
       name: json['name'] ?? '',
       departmentId: json['department_id'] ?? '',
       advisorId: json['advisor_id'] ?? '',
+    );
+  }
+}
+
+class ComplaintHistory {
+  final String id;
+  final String complaintId;
+  final String userId;
+  final String? comment;
+  final String status;
+  final DateTime updatedAt;
+
+  ComplaintHistory({
+    required this.id,
+    required this.complaintId,
+    required this.userId,
+    this.comment,
+    required this.status,
+    required this.updatedAt,
+  });
+
+  factory ComplaintHistory.fromJson(Map<String, dynamic> json) {
+    return ComplaintHistory(
+      id: json['id'] ?? '',
+      complaintId: json['complaint_id'] ?? '',
+      userId: json['user_id'] ?? '',
+      comment: json['comment'],
+      status: json['status'] ?? '',
+      updatedAt: DateTime.parse(json['updated_at'] ?? DateTime.now().toIso8601String()),
     );
   }
 }

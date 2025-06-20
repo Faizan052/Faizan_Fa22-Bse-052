@@ -12,7 +12,6 @@ class AuthProvider extends ChangeNotifier {
 
   AuthProvider() {
     _supabase.auth.onAuthStateChange.listen((data) {
-      print('AuthProvider: Auth state changed: ${data.event}');
       if (data.event == AuthChangeEvent.signedIn) {
         loadCurrentUser();
       } else if (data.event == AuthChangeEvent.signedOut) {
@@ -24,10 +23,8 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> login(String email, String password, BuildContext context) async {
     try {
-      print('AuthProvider: Attempting login with email: $email');
       final user = await _authService.login(email, password);
       if (user != null) {
-        print('AuthProvider: Login successful, user: ${user.id}');
         _user = user;
         notifyListeners();
         Navigator.pushReplacement(
@@ -35,13 +32,11 @@ class AuthProvider extends ChangeNotifier {
           MaterialPageRoute(builder: (_) => DashboardScreen(user: user)),
         );
       } else {
-        print('AuthProvider: Login failed, user is null');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Invalid credentials')),
         );
       }
     } catch (e) {
-      print('AuthProvider: Login error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login error: $e')),
       );
@@ -49,38 +44,90 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> loadCurrentUser() async {
-    try {
-      print('AuthProvider: Loading current user');
-      final user = await _authService.getCurrentUser();
-      _user = user;
-      notifyListeners();
-      print('AuthProvider: User load result: ${_user?.id ?? 'null'}');
-    } catch (e) {
-      print('AuthProvider: Load current user error: $e');
-    }
+    final user = await _authService.getCurrentUser();
+    _user = user;
+    notifyListeners();
   }
 
   Future<void> signOut() async {
     await _authService.signOut();
     _user = null;
     notifyListeners();
-    print('AuthProvider: Signed out');
   }
 }
 
 class ComplaintProvider extends ChangeNotifier {
   List<models.Complaint> _complaints = [];
   List<models.Complaint> get complaints => _complaints;
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
 
   Future<void> fetchComplaints(String userId, String role) async {
+    _isLoading = true;
+    notifyListeners();
     try {
-      print('ComplaintProvider: Fetching complaints for user: $userId, role: $role');
       _complaints = await DatabaseService().getComplaints(userId, role);
-      print('ComplaintProvider: Fetched ${_complaints.length} complaints');
-      notifyListeners();
     } catch (e) {
-      print('ComplaintProvider: Fetch error: $e');
-      throw 'Failed to fetch complaints: $e';
+      print('Error fetching complaints: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> refreshComplaints(String userId, String role) async {
+    await fetchComplaints(userId, role);
+  }
+}
+
+class AdminProvider extends ChangeNotifier {
+  List<models.Department> _departments = [];
+  List<models.Batch> _batches = [];
+  List<models.User> _users = [];
+  bool _isLoading = false;
+
+  List<models.Department> get departments => _departments;
+  List<models.Batch> get batches => _batches;
+  List<models.User> get users => _users;
+  bool get isLoading => _isLoading;
+
+  Future<void> fetchDepartments() async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      _departments = await DatabaseService().getDepartments();
+    } catch (e) {
+      print('Error fetching departments: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchBatches() async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      _batches = await DatabaseService().getBatches();
+    } catch (e) {
+      print('Error fetching batches: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchUsers() async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final response = await Supabase.instance.client.from('users').select();
+      _users = response.map((e) => models.User.fromJson(e)).toList();
+    } catch (e) {
+      print('Error fetching users: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 }
