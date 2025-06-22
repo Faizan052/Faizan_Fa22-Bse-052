@@ -1,0 +1,3 @@
+// Dart file to add shared_preferences as a dependency for session persistence
+// Add this to pubspec.yaml under dependencies:
+// shared_preferences: ^2.2.2
