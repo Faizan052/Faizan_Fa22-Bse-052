@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import '../providers/complaint_provider.dart';
 import 'complaint_form.dart';
 import 'complaint_history.dart';
+import '../services/user_lookup_service.dart';
 
 class StudentDashboard extends StatefulWidget {
   @override
@@ -11,6 +12,15 @@ class StudentDashboard extends StatefulWidget {
 }
 
 class _StudentDashboardState extends State<StudentDashboard> {
+  String _selectedStatus = 'All';
+  static const List<String> _statusOptions = [
+    'All',
+    'Pending',
+    'Resolved',
+    'Rejected',
+    'Escalated to HOD',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -49,24 +59,75 @@ class _StudentDashboardState extends State<StudentDashboard> {
           if (provider.complaints.isEmpty) {
             return Center(child: Text('No complaints found.'));
           }
-          return ListView.builder(
-            itemCount: provider.complaints.length,
-            itemBuilder: (_, i) => ListTile(
-              title: Text(provider.complaints[i].title),
-              subtitle: Text(provider.complaints[i].status),
-              trailing: Text(provider.complaints[i].createdAt
-                  .toLocal()
-                  .toString()
-                  .split(" ").first),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ComplaintHistory(complaintId: provider.complaints[i].id!),
-                  ),
-                );
-              },
-            ),
+          // Filter logic
+          List complaints = provider.complaints.where((c) {
+            if (_selectedStatus == 'All') return true;
+            if (_selectedStatus == 'Pending') return c.status == 'Submitted' || c.status == 'In Progress';
+            return c.status == _selectedStatus;
+          }).toList();
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: DropdownButton<String>(
+                  value: _selectedStatus,
+                  items: _statusOptions.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+                  onChanged: (val) => setState(() => _selectedStatus = val!),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: complaints.length,
+                  itemBuilder: (_, i) {
+                    return ListTile(
+                      title: Text(complaints[i].title),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          (complaints[i].status == 'Resolved' || complaints[i].status == 'Rejected')
+                              ? Text(
+                                  complaints[i].status == 'Resolved'
+                                      ? 'This complaint is resolved.'
+                                      : 'This complaint is rejected.',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: complaints[i].status == 'Resolved' ? Colors.green : Colors.red,
+                                  ),
+                                )
+                              : Text(complaints[i].status),
+                          FutureBuilder<String>(
+                            future: UserLookupService.getUserName(complaints[i].studentId),
+                            builder: (context, studentSnap) => Text("Student: "+(studentSnap.data ?? complaints[i].studentId)),
+                          ),
+                          FutureBuilder<String>(
+                            future: UserLookupService.getUserName(complaints[i].advisorId),
+                            builder: (context, advisorSnap) => Text("Advisor: "+(advisorSnap.data ?? complaints[i].advisorId)),
+                          ),
+                          complaints[i].hodId != null && complaints[i].hodId!.isNotEmpty
+                            ? FutureBuilder<String>(
+                                future: UserLookupService.getUserName(complaints[i].hodId!),
+                                builder: (context, hodSnap) => Text("HOD: "+(hodSnap.data ?? complaints[i].hodId!)),
+                              )
+                            : SizedBox.shrink(),
+                        ],
+                      ),
+                      trailing: Text(complaints[i].createdAt
+                          .toLocal()
+                          .toString()
+                          .split(" ").first),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ComplaintHistory(complaintId: complaints[i].id!),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
           );
         },
       ),

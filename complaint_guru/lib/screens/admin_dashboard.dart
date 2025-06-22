@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import '../services/excel_service.dart';
 import 'complaint_history.dart';
 import '../providers/auth_provider.dart';
+import '../services/user_lookup_service.dart';
 
 class AdminDashboard extends StatefulWidget {
   @override
@@ -13,6 +14,14 @@ class AdminDashboard extends StatefulWidget {
 
 class _AdminDashboardState extends State<AdminDashboard> {
   final ExcelService excelService = ExcelService();
+  String _selectedStatus = 'All';
+  static const List<String> _statusOptions = [
+    'All',
+    'Pending',
+    'Resolved',
+    'Rejected',
+    'Escalated to HOD',
+  ];
 
   @override
   void initState() {
@@ -37,12 +46,16 @@ class _AdminDashboardState extends State<AdminDashboard> {
       ),
       body: Consumer<ComplaintProvider>(
         builder: (context, provider, _) {
-          final complaints = provider.complaints;
-          final total = complaints.length;
-          final resolved = complaints.where((c) => c.status == 'Resolved').length;
-          final pending = complaints.where((c) => c.status == 'Submitted' || c.status == 'In Progress').length;
-          final escalated = complaints.where((c) => c.status == 'Escalated to HOD').length;
-          final rejected = complaints.where((c) => c.status == 'Rejected').length;
+          final complaints = provider.complaints.where((c) {
+            if (_selectedStatus == 'All') return true;
+            if (_selectedStatus == 'Pending') return c.status == 'Submitted' || c.status == 'In Progress';
+            return c.status == _selectedStatus;
+          }).toList();
+          final total = provider.complaints.length;
+          final resolved = provider.complaints.where((c) => c.status == 'Resolved').length;
+          final pending = provider.complaints.where((c) => c.status == 'Submitted' || c.status == 'In Progress').length;
+          final escalated = provider.complaints.where((c) => c.status == 'Escalated to HOD').length;
+          final rejected = provider.complaints.where((c) => c.status == 'Rejected').length;
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -78,6 +91,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     },
                   ),
                   SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: DropdownButton<String>(
+                      value: _selectedStatus,
+                      items: _statusOptions.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+                      onChanged: (val) => setState(() => _selectedStatus = val!),
+                    ),
+                  ),
                   Text("Complaints List", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                   Divider(),
                   provider.isLoading
@@ -88,7 +109,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           itemCount: complaints.length,
                           itemBuilder: (_, i) => ListTile(
                             title: Text(complaints[i].title),
-                            subtitle: Text(complaints[i].status),
                             trailing: IconButton(
                               icon: Icon(Icons.history),
                               onPressed: () => Navigator.push(
@@ -97,6 +117,37 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                   builder: (_) => ComplaintHistory(complaintId: complaints[i].id!),
                                 ),
                               ),
+                            ),
+                            isThreeLine: true,
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                (complaints[i].status == 'Resolved' || complaints[i].status == 'Rejected')
+                                    ? Text(
+                                        complaints[i].status == 'Resolved'
+                                            ? 'This complaint is resolved.'
+                                            : 'This complaint is rejected.',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: complaints[i].status == 'Resolved' ? Colors.green : Colors.red,
+                                        ),
+                                      )
+                                    : Text(complaints[i].status),
+                                FutureBuilder<String>(
+                                  future: UserLookupService.getUserName(complaints[i].studentId),
+                                  builder: (context, studentSnap) => Text("Student: "+(studentSnap.data ?? complaints[i].studentId)),
+                                ),
+                                FutureBuilder<String>(
+                                  future: UserLookupService.getUserName(complaints[i].advisorId),
+                                  builder: (context, advisorSnap) => Text("Advisor: "+(advisorSnap.data ?? complaints[i].advisorId)),
+                                ),
+                                complaints[i].hodId != null && complaints[i].hodId!.isNotEmpty
+                                  ? FutureBuilder<String>(
+                                      future: UserLookupService.getUserName(complaints[i].hodId!),
+                                      builder: (context, hodSnap) => Text("HOD: "+(hodSnap.data ?? complaints[i].hodId!)),
+                                    )
+                                  : SizedBox.shrink(),
+                              ],
                             ),
                           ),
                         ),

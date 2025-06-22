@@ -5,6 +5,7 @@ import '../providers/complaint_provider.dart';
 import '../models/complaint.dart';
 import 'complaint_history.dart';
 import '../services/supabase_service.dart';
+import '../services/user_lookup_service.dart';
 
 class AdvisorDashboard extends StatefulWidget {
   @override
@@ -12,6 +13,15 @@ class AdvisorDashboard extends StatefulWidget {
 }
 
 class _AdvisorDashboardState extends State<AdvisorDashboard> {
+  String _selectedStatus = 'All';
+  static const List<String> _statusOptions = [
+    'All',
+    'Pending',
+    'Resolved',
+    'Rejected',
+    'Escalated to HOD',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -40,28 +50,86 @@ class _AdvisorDashboardState extends State<AdvisorDashboard> {
       ),
       body: Consumer<ComplaintProvider>(
         builder: (context, provider, _) {
+          final complaints = provider.complaints.where((c) {
+            if (_selectedStatus == 'All') return true;
+            if (_selectedStatus == 'Pending') return c.status == 'Submitted' || c.status == 'In Progress';
+            return c.status == _selectedStatus;
+          }).toList();
+          final pendingCount = provider.complaints.where((c) => c.status == 'Submitted' || c.status == 'In Progress').length;
           if (provider.isLoading) {
             return Center(child: CircularProgressIndicator());
           }
-          if (provider.complaints.isEmpty) {
-            return Center(child: Text('No complaints found.'));
-          }
-          return ListView.builder(
-            itemCount: provider.complaints.length,
-            itemBuilder: (_, i) => ListTile(
-              title: Text(provider.complaints[i].title),
-              subtitle: Text(provider.complaints[i].status),
-              onTap: () => _showActions(context, provider.complaints[i], user.id),
-              trailing: IconButton(
-                icon: Icon(Icons.history),
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ComplaintHistory(complaintId: provider.complaints[i].id!),
-                  ),
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButton<String>(
+                        value: _selectedStatus,
+                        items: _statusOptions.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+                        onChanged: (val) => setState(() => _selectedStatus = val!),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Text('Pending: $pendingCount', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.orange)),
+                    ),
+                  ],
                 ),
               ),
-            ),
+              Expanded(
+                child: complaints.isEmpty
+                    ? Center(child: Text('No complaints found.'))
+                    : ListView.builder(
+                        itemCount: complaints.length,
+                        itemBuilder: (_, i) => ListTile(
+                          title: Text(complaints[i].title),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              (complaints[i].status == 'Resolved' || complaints[i].status == 'Rejected')
+                                  ? Text(
+                                      complaints[i].status == 'Resolved'
+                                          ? 'This complaint is resolved.'
+                                          : 'This complaint is rejected.',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: complaints[i].status == 'Resolved' ? Colors.green : Colors.red,
+                                      ),
+                                    )
+                                  : Text(complaints[i].status),
+                              FutureBuilder<String>(
+                                future: UserLookupService.getUserName(complaints[i].studentId),
+                                builder: (context, studentSnap) => Text("Student: "+(studentSnap.data ?? complaints[i].studentId)),
+                              ),
+                              FutureBuilder<String>(
+                                future: UserLookupService.getUserName(complaints[i].advisorId),
+                                builder: (context, advisorSnap) => Text("Advisor: "+(advisorSnap.data ?? complaints[i].advisorId)),
+                              ),
+                              complaints[i].hodId != null && complaints[i].hodId!.isNotEmpty
+                                ? FutureBuilder<String>(
+                                    future: UserLookupService.getUserName(complaints[i].hodId!),
+                                    builder: (context, hodSnap) => Text("HOD: "+(hodSnap.data ?? complaints[i].hodId!)),
+                                  )
+                                : SizedBox.shrink(),
+                            ],
+                          ),
+                          onTap: () => _showActions(context, complaints[i], user.id),
+                          trailing: IconButton(
+                            icon: Icon(Icons.history),
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ComplaintHistory(complaintId: complaints[i].id!),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+              ),
+            ],
           );
         },
       ),
@@ -70,7 +138,7 @@ class _AdvisorDashboardState extends State<AdvisorDashboard> {
 
   void _showActions(BuildContext context, Complaint c, String userId) {
     final commentCtrl = TextEditingController();
-    final isResolved = c.status == 'Resolved';
+    final isResolvedOrRejected = c.status == 'Resolved' || c.status == 'Rejected';
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -88,10 +156,36 @@ class _AdvisorDashboardState extends State<AdvisorDashboard> {
               padding: const EdgeInsets.only(top: 4.0),
               child: Text('Video: ${c.videoUrl}'),
             ),
-            TextField(controller: commentCtrl, decoration: InputDecoration(labelText: "Comment")),
+            SizedBox(height: 8),
+            if (isResolvedOrRejected)
+              Text(
+                c.status == 'Resolved' ? 'This complaint is resolved.' : 'This complaint is rejected.',
+                style: TextStyle(fontWeight: FontWeight.bold, color: c.status == 'Resolved' ? Colors.green : Colors.red),
+              ),
+            if (!isResolvedOrRejected)
+              TextField(controller: commentCtrl, decoration: InputDecoration(labelText: "Comment")),
+            SizedBox(height: 8),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ComplaintHistory(complaintId: c.id!),
+                  ),
+                );
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.history),
+                  SizedBox(width: 4),
+                  Text('View History'),
+                ],
+              ),
+            ),
           ],
         ),
-        actions: isResolved
+        actions: isResolvedOrRejected
             ? [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
