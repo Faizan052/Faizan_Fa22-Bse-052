@@ -89,6 +89,44 @@ class SupabaseService {
     await _client.from('complaints').update({'status': 'Escalated to HOD', 'hod_id': hodId}).eq('id', complaintId);
   }
 
+  // User CRUD
+  static Future<List<Map<String, dynamic>>> getAllUsers() async {
+    final data = await _client.from('users').select();
+    return List<Map<String, dynamic>>.from(data);
+  }
+
+  static Future<void> createUser(Map<String, dynamic> user) async {
+    await _client.from('users').insert(user);
+  }
+
+  static Future<void> updateUser(String userId, Map<String, dynamic> updates) async {
+    await _client.from('users').update(updates).eq('id', userId);
+  }
+
+  static Future<void> deleteUser(String userId) async {
+    await _client.from('users').delete().eq('id', userId);
+  }
+
+  // HOD CRUD (users with role 'hod')
+  static Future<List<Map<String, dynamic>>> getAllHods() async {
+    final data = await _client.from('users').select().eq('role', 'hod');
+    return List<Map<String, dynamic>>.from(data);
+  }
+
+  static Future<void> createHod(Map<String, dynamic> hod) async {
+    hod['role'] = 'hod';
+    await _client.from('users').insert(hod);
+  }
+
+  static Future<void> updateHod(String hodId, Map<String, dynamic> updates) async {
+    updates['role'] = 'hod';
+    await _client.from('users').update(updates).eq('id', hodId);
+  }
+
+  static Future<void> deleteHod(String hodId) async {
+    await _client.from('users').delete().eq('id', hodId).eq('role', 'hod');
+  }
+
   // TODO: Implement real-time updates for complaints using Supabase Realtime.
   // TODO: Add notification triggers on complaint status change.
   // TODO: Explore advanced queries for filtering and searching complaints.

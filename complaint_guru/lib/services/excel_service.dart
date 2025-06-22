@@ -6,14 +6,14 @@ import 'package:file_picker/file_picker.dart';
 class ExcelService {
   final _client = Supabase.instance.client;
 
-  Future<bool> uploadStudentExcel(PlatformFile file) async {
+  Future<String> uploadStudentExcel(PlatformFile file) async {
     try {
-      final bytes = File(file.path!).readAsBytesSync();
+      final bytes = file.bytes ?? (file.path != null ? File(file.path!).readAsBytesSync() : null);
+      if (bytes == null) {
+        return "Upload Failed: No file data found (check file selection).";
+      }
       final excel = Excel.decodeBytes(bytes);
-
-      // TODO: Validate Excel format (e.g., check for required columns)
-      // TODO: Provide feedback on validation results
-
+      int added = 0;
       for (final table in excel.tables.keys) {
         final sheet = excel.tables[table]!;
         for (var row in sheet.rows.skip(1)) {
@@ -23,28 +23,36 @@ class ExcelService {
           final dept = row[3]?.value.toString();
           final advisorEmail = row[4]?.value.toString();
 
+          if (batch == null) {
+            return 'Batch is missing in the Excel row.';
+          }
           if (dept == null || advisorEmail == null) {
-            throw Exception('Department or Advisor Email is missing in the Excel row.');
+            return 'Department or Advisor Email is missing in the Excel row.';
+          }
+          if (email == null) {
+            return 'Email is missing in the Excel row.';
           }
           final deptId = await _lookupId('departments', 'name', dept);
           final advisorId = await _lookupId('users', 'email', advisorEmail);
+          final existing = await _client.from('users').select('id').eq('email', email).maybeSingle();
+          if (existing != null) continue; // skip duplicate
 
-          // TODO: Handle duplicate users (e.g., skip or update existing users)
           final user = {
-            'name': name,
+            'name': name ?? '',
             'email': email,
             'role': 'student',
             'department_id': deptId,
-            'batch_id': await _ensureBatch(batch!, deptId, advisorId),
+            'batch_id': await _ensureBatch(batch, deptId, advisorId),
           };
 
           await _client.from('users').insert(user);
+          added++;
         }
       }
-      return true;
+      return 'Upload Successful: $added students added.';
     } catch (e) {
       print("Excel error: $e");
-      return false;
+      return 'Upload Failed: ${e.toString()}';
     }
   }
 

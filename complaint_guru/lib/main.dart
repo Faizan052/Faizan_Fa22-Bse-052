@@ -4,6 +4,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'providers/auth_provider.dart';
 import 'providers/complaint_provider.dart';
 import 'routes/app_routes.dart';
+import 'screens/admin/department_management.dart';
+import 'screens/admin/batch_management.dart';
+import 'screens/admin/hod_management.dart';
+import 'screens/admin/user_management.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,6 +40,12 @@ class ComplaintGuruApp extends StatelessWidget {
       initialRoute: '/',
       onGenerateRoute: AppRoutes.generate,
       debugShowCheckedModeBanner: false,
+      routes: {
+        '/admin/department-management': (context) => DepartmentManagementScreen(),
+        '/admin/batch-management': (context) => BatchManagementScreen(),
+        '/admin/hod-management': (context) => HodManagementScreen(),
+        '/admin/user-management': (context) => UserManagementScreen(),
+      },
     );
   }
 }
