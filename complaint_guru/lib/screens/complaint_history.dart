@@ -33,24 +33,48 @@ class ComplaintHistory extends StatelessWidget {
             .order('created_at')
             .then((value) => value as List),
         builder: (_, snapshot) {
+          // Loading state - enhanced styling
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
-              child: CircularProgressIndicator(
-                color: theme.primaryColor,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    color: theme.primaryColor,
+                    strokeWidth: 3,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Loading history...',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: theme.textTheme.bodyLarge?.color?.withOpacity(0.7),
+                    ),
+                  ),
+                ],
               ),
             );
           }
 
+          // Error state - enhanced styling
           if (snapshot.hasError) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 48, color: Colors.red),
+                  Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: Colors.red[400],
+                  ),
                   SizedBox(height: 16),
                   Text(
                     'Failed to load history',
-                    style: TextStyle(fontSize: 18, color: Colors.red),
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.red[400],
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),
@@ -58,18 +82,25 @@ class ComplaintHistory extends StatelessWidget {
           }
 
           final history = snapshot.data ?? [];
+
+          // Empty state - enhanced styling
           if (history.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.history, size: 48, color: Colors.grey),
+                  Icon(
+                    Icons.history,
+                    size: 48,
+                    color: Colors.grey.withOpacity(0.5),
+                  ),
                   SizedBox(height: 16),
                   Text(
                     'No history available',
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.grey,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
@@ -91,124 +122,141 @@ class ComplaintHistory extends StatelessWidget {
                 builder: (context, userSnap) {
                   final userName = userSnap.data ?? (entry['user_id'] ?? 'System');
 
-                  return Container(
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: isDarkMode ? Colors.grey[800] : Colors.white,
+                  return Card(
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 6,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Header with action and date
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                entry['action'],
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: isResolution
-                                      ? (entry['action'] == 'Resolved'
-                                      ? Colors.green
-                                      : Colors.red)
-                                      : theme.primaryColor,
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Header with action and date - enhanced styling
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  entry['action'],
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: isResolution
+                                        ? (entry['action'] == 'Resolved'
+                                        ? Colors.green
+                                        : Colors.red)
+                                        : theme.primaryColor,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: isDarkMode ? Colors.grey[700] : Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  entry['created_at'].toString().split('T').first,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: isDarkMode ? Colors.white70 : Colors.grey[700],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          SizedBox(height: 12),
+
+                          // Comment section - enhanced styling
+                          if ((entry['comment'] ?? '').isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: Container(
+                                padding: EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: isDarkMode
+                                      ? Colors.grey[800]
+                                      : Colors.grey[50],
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  entry['comment'],
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                                  ),
                                 ),
                               ),
                             ),
-                            Text(
-                              _formatDate(entry['created_at']),
-                              style: TextStyle(
+
+                          // User info - enhanced styling
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.person_outline,
+                                size: 16,
                                 color: Colors.grey,
-                                fontSize: 12,
                               ),
-                            ),
-                          ],
-                        ),
-
-                        SizedBox(height: 12),
-
-                        // Comment section
-                        if ((entry['comment'] ?? '').isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: Text(
-                              entry['comment'],
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: isDarkMode ? Colors.white70 : Colors.black87,
+                              SizedBox(width: 8),
+                              Text(
+                                'By: $userName',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey,
+                                ),
                               ),
-                            ),
+                            ],
                           ),
 
-                        // User info
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.person_outline,
-                              size: 16,
-                              color: Colors.grey,
-                            ),
-                            SizedBox(width: 4),
-                            Text(
-                              'By: $userName',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        // Special status for resolutions
-                        if (isResolution)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 12),
-                            child: Container(
-                              padding: EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: (entry['action'] == 'Resolved'
-                                    ? Colors.green.withOpacity(0.1)
-                                    : Colors.red.withOpacity(0.1)),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    entry['action'] == 'Resolved'
-                                        ? Icons.check_circle
-                                        : Icons.cancel,
-                                    color: entry['action'] == 'Resolved'
+                          // Special status for resolutions - enhanced styling
+                          if (isResolution)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12),
+                              child: Container(
+                                padding: EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: (entry['action'] == 'Resolved'
+                                      ? Colors.green.withOpacity(0.1)
+                                      : Colors.red.withOpacity(0.1)),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: (entry['action'] == 'Resolved'
                                         ? Colors.green
-                                        : Colors.red,
-                                    size: 18,
+                                        : Colors.red)
+                                        .withOpacity(0.2),
                                   ),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    entry['action'] == 'Resolved'
-                                        ? 'This complaint was resolved'
-                                        : 'This complaint was rejected',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      entry['action'] == 'Resolved'
+                                          ? Icons.check_circle
+                                          : Icons.cancel,
                                       color: entry['action'] == 'Resolved'
                                           ? Colors.green
                                           : Colors.red,
+                                      size: 20,
                                     ),
-                                  ),
-                                ],
+                                    SizedBox(width: 12),
+                                    Text(
+                                      entry['action'] == 'Resolved'
+                                          ? 'This complaint was resolved'
+                                          : 'This complaint was rejected',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: entry['action'] == 'Resolved'
+                                            ? Colors.green
+                                            : Colors.red,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                      ],
+                        ],
+                      ),
                     ),
                   );
                 },
@@ -218,11 +266,5 @@ class ComplaintHistory extends StatelessWidget {
         },
       ),
     );
-  }
-
-  String _formatDate(dynamic date) {
-    if (date == null) return '';
-    final dateStr = date.toString();
-    return dateStr.split('T').first;
   }
 }

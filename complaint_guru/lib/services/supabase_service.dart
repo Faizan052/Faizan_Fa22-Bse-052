@@ -1,10 +1,13 @@
-import 'package:supabase/supabase.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase/supabase.dart' as sb;
 import '../models/user.dart';
 
 class SupabaseService {
-  static final _client = SupabaseClient(
+  static final _client = Supabase.instance.client;
+  // Admin client for service role operations (never expose this in production client apps!)
+  static final _adminClient = sb.SupabaseClient(
     'https://vgxztzhbiljfgewfokkj.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZneHp0emhiaWxqZmdld2Zva2tqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5NzYxNjAsImV4cCI6MjA2NTU1MjE2MH0.yBWDxXOH5qdOIezTnZLUFfy4tQ6PZ3X4uJE-sazM2DY',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZneHp0emhiaWxqZmdld2Zva2tqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0OTk3NjE2MCwiZXhwIjoyMDY1NTUyMTYwfQ.20e21Ck9qszbJ3XT1nhG4IRheW4anXOTRKVdtt5JibY',
   );
 
   static Future<UserModel?> signIn(String email, String password) async {
@@ -125,6 +128,58 @@ class SupabaseService {
 
   static Future<void> deleteHod(String hodId) async {
     await _client.from('users').delete().eq('id', hodId).eq('role', 'hod');
+  }
+
+  static Future<void> registerUserWithAuth({
+    required String name,
+    required String email,
+    required String password,
+    required String role,
+    String? batchId,
+    String? departmentId,
+  }) async {
+    // Register in Supabase Auth
+    final res = await _client.auth.admin.createUser(
+      AdminUserAttributes(email: email, password: password, emailConfirm: true),
+    );
+    final userId = res.user?.id;
+    if (userId == null) throw Exception('Failed to create user in Auth');
+    // Insert into users table
+    final userMap = {
+      'id': userId,
+      'name': name,
+      'email': email,
+      'role': role,
+      'batch_id': batchId?.isNotEmpty == true ? batchId : null,
+      'department_id': departmentId?.isNotEmpty == true ? departmentId : null,
+    };
+    await _client.from('users').insert(userMap);
+  }
+
+  static Future<void> registerUserWithAuthClient({
+    required String name,
+    required String email,
+    required String password,
+    required String role,
+    String? batchId,
+    String? departmentId,
+  }) async {
+    // Register in Supabase Auth using admin client (service role)
+    final res = await _adminClient.auth.admin.createUser(
+      sb.AdminUserAttributes(email: email, password: password, emailConfirm: true),
+    );
+    final userId = res.user?.id;
+    if (userId == null) throw Exception('Failed to create user in Auth: ' + (res.user?.toString() ?? 'No user'));
+    // Insert into users table using admin client
+    final userMap = {
+      'id': userId,
+      'name': name,
+      'email': email,
+      'role': role,
+      'batch_id': batchId?.isNotEmpty == true ? batchId : null,
+      'department_id': departmentId?.isNotEmpty == true ? departmentId : null,
+    };
+    await _adminClient.from('users').insert(userMap);
   }
 
   // TODO: Implement real-time updates for complaints using Supabase Realtime.

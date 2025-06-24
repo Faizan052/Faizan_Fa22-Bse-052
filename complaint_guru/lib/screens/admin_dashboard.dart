@@ -33,7 +33,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = MediaQuery.of(context).size.width < 600;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -86,273 +86,302 @@ class _AdminDashboardState extends State<AdminDashboard> {
             final escalated = provider.complaints.where((c) => c.status == 'Escalated to HOD').length;
             final rejected = provider.complaints.where((c) => c.status == 'Rejected').length;
 
-            return SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(16, 100, 16, 32),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height - 100,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Stats Cards Grid - Responsive layout
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        final crossAxisCount = constraints.maxWidth > 600 ? 4 : 2;
-                        return GridView.count(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          crossAxisCount: crossAxisCount,
-                          childAspectRatio: 1.4,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          children: [
-                            _StatCard(
-                              icon: Icons.list_alt,
-                              value: total,
-                              label: 'Total',
-                              color: Color(0xFF4285F4),
-                            ),
-                            _StatCard(
-                              icon: Icons.check_circle,
-                              value: resolved,
-                              label: 'Resolved',
-                              color: Color(0xFF0F9D58),
-                            ),
-                            _StatCard(
-                              icon: Icons.hourglass_bottom,
-                              value: pending,
-                              label: 'Pending',
-                              color: Color(0xFFF4B400),
-                            ),
-                            _StatCard(
-                              icon: Icons.trending_up,
-                              value: escalated,
-                              label: 'Escalated',
-                              color: Color(0xFFDB4437),
-                            ),
-                            if (crossAxisCount == 2) // Show rejected card in second row for mobile
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  padding: EdgeInsets.fromLTRB(16, 100, 16, 32),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight - 100,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Stats Cards Grid - Responsive layout
+                        if (isMobile)
+                          Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(child: _StatCard(
+                                    icon: Icons.list_alt,
+                                    value: total,
+                                    label: 'Total',
+                                    color: Color(0xFF4285F4),
+                                  )),
+                                  SizedBox(width: 12),
+                                  Expanded(child: _StatCard(
+                                    icon: Icons.check_circle,
+                                    value: resolved,
+                                    label: 'Resolved',
+                                    color: Color(0xFF0F9D58),
+                                  )),
+                                ],
+                              ),
+                              SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  Expanded(child: _StatCard(
+                                    icon: Icons.hourglass_bottom,
+                                    value: pending,
+                                    label: 'Pending',
+                                    color: Color(0xFFF4B400),
+                                  )),
+                                  SizedBox(width: 12),
+                                  Expanded(child: _StatCard(
+                                    icon: Icons.trending_up,
+                                    value: escalated,
+                                    label: 'Escalated',
+                                    color: Color(0xFFDB4437),
+                                  )),
+                                ],
+                              ),
+                              SizedBox(height: 12),
+                              _StatCard(
+                                icon: Icons.cancel,
+                                value: rejected,
+                                label: 'Rejected',
+                                color: Color(0xFF9E9E9E),
+                                isFullWidth: true,
+                              ),
+                            ],
+                          )
+                        else
+                          GridView.count(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            crossAxisCount: 5,
+                            childAspectRatio: 1.2,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                            children: [
+                              _StatCard(
+                                icon: Icons.list_alt,
+                                value: total,
+                                label: 'Total',
+                                color: Color(0xFF4285F4),
+                              ),
+                              _StatCard(
+                                icon: Icons.check_circle,
+                                value: resolved,
+                                label: 'Resolved',
+                                color: Color(0xFF0F9D58),
+                              ),
+                              _StatCard(
+                                icon: Icons.hourglass_bottom,
+                                value: pending,
+                                label: 'Pending',
+                                color: Color(0xFFF4B400),
+                              ),
+                              _StatCard(
+                                icon: Icons.trending_up,
+                                value: escalated,
+                                label: 'Escalated',
+                                color: Color(0xFFDB4437),
+                              ),
                               _StatCard(
                                 icon: Icons.cancel,
                                 value: rejected,
                                 label: 'Rejected',
                                 color: Color(0xFF9E9E9E),
                               ),
-                          ],
-                        );
-                      },
-                    ),
-
-                    // Rejected Card (shown only in desktop view)
-                    if (screenWidth > 600)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 12),
-                        child: _StatCard(
-                          icon: Icons.cancel,
-                          value: rejected,
-                          label: 'Rejected',
-                          color: Color(0xFF9E9E9E),
-                          isFullWidth: true,
-                        ),
-                      ),
-
-                    SizedBox(height: 24),
-
-                    // Excel Upload Button
-                    Center(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(maxWidth: 400),
-                        child: ElevatedButton.icon(
-                          icon: Icon(Icons.upload_file, size: 22),
-                          label: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            child: Text(
-                              "Upload Students via Excel",
-                              style: TextStyle(fontSize: 16),
-                            ),
+                            ],
                           ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF1976D2),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 4,
-                            shadowColor: Colors.black26,
-                            minimumSize: Size(double.infinity, 50),
-                          ),
-                          onPressed: () async {
-                            final result = await FilePicker.platform.pickFiles(
-                              type: FileType.custom,
-                              allowedExtensions: ['xlsx', 'csv'],
-                            );
-                            if (result != null) {
-                              final file = result.files.single;
-                              final message = await excelService.uploadStudentExcel(file);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(message),
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
+
+                        SizedBox(height: 24),
+
+                        // Excel Upload Button
+                        Center(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: 400),
+                            child: ElevatedButton.icon(
+                              icon: Icon(Icons.upload_file, size: 22),
+                              label: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                child: Text(
+                                  "Upload Students via Excel",
+                                  style: TextStyle(fontSize: 16),
                                 ),
-                              );
-                            }
-                          },
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFF1976D2),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 4,
+                                shadowColor: Colors.black26,
+                                minimumSize: Size(double.infinity, 50),
+                              ),
+                              onPressed: () async {
+                                final result = await FilePicker.platform.pickFiles(
+                                  type: FileType.custom,
+                                  allowedExtensions: ['xlsx', 'csv'],
+                                );
+                                if (result != null) {
+                                  final file = result.files.single;
+                                  final message = await excelService.uploadStudentExcel(file);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(message),
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
 
-                    SizedBox(height: 28),
+                        SizedBox(height: 28),
 
-                    // Filter Section
-                    ConstrainedBox(
-                      constraints: BoxConstraints(maxWidth: 400),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: isDarkMode ? Colors.grey[800] : Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                          BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 6,
-                          offset: Offset(0, 2)),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.filter_alt, color: Color(0xFF4F8FFF)),
-                            SizedBox(width: 12),
-                            Expanded(
-                              child: DropdownButton<String>(
-                                value: _selectedStatus,
-                                items: _statusOptions.map((s) => DropdownMenuItem(
-                                  value: s,
-                                  child: Text(
-                                    s,
+                        // Filter Section
+                        ConstrainedBox(
+                          constraints: BoxConstraints(maxWidth: 400),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            decoration: BoxDecoration(
+                              color: isDarkMode ? Colors.grey[800] : Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 6,
+                                    offset: Offset(0, 2)),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.filter_alt, color: Color(0xFF4F8FFF)),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: DropdownButton<String>(
+                                    value: _selectedStatus,
+                                    items: _statusOptions.map((s) => DropdownMenuItem(
+                                      value: s,
+                                      child: Text(
+                                        s,
+                                        style: TextStyle(
+                                          color: isDarkMode ? Colors.white : Colors.black87,
+                                        ),
+                                      ),
+                                    )).toList(),
+                                    onChanged: (val) => setState(() => _selectedStatus = val!),
+                                    underline: SizedBox(),
+                                    isExpanded: true,
+                                    dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
+                                    icon: Icon(Icons.arrow_drop_down, color: Color(0xFF4F8FFF)),
                                     style: TextStyle(
+                                      fontSize: 16,
                                       color: isDarkMode ? Colors.white : Colors.black87,
                                     ),
                                   ),
-                                )).toList(),
-                                onChanged: (val) => setState(() => _selectedStatus = val!),
-                                underline: SizedBox(),
-                                isExpanded: true,
-                                dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
-                                icon: Icon(Icons.arrow_drop_down, color: Color(0xFF4F8FFF)),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(height: 32),
+
+                        // Complaints List Header
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Row(
+                            children: [
+                              Icon(Icons.report_problem, color: Colors.white, size: 26),
+                              SizedBox(width: 10),
+                              Text(
+                                "Complaints List",
                                 style: TextStyle(
-                                  fontSize: 16,
-                                  color: isDarkMode ? Colors.white : Colors.black87,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  color: Colors.white,
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ),
 
-                    SizedBox(height: 32),
+                        Divider(
+                          color: Colors.white54,
+                          thickness: 1,
+                          height: 24,
+                          endIndent: 8,
+                        ),
 
-                    // Complaints List Header
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Row(
-                        children: [
-                          Icon(Icons.report_problem, color: Colors.white, size: 26),
-                          SizedBox(width: 10),
-                          Text(
-                            "Complaints List",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                              color: Colors.white,
+                        // Complaints List
+                        provider.isLoading
+                            ? Center(child: CircularProgressIndicator(color: Colors.white))
+                            : complaints.isEmpty
+                            ? Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 40),
+                          child: Center(
+                            child: Column(
+                              children: [
+                                Icon(Icons.inbox, size: 48, color: Colors.white54),
+                                SizedBox(height: 16),
+                                Text(
+                                  "No complaints found",
+                                  style: TextStyle(
+                                    color: Colors.white54,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-
-                    Divider(
-                      color: Colors.white54,
-                      thickness: 1,
-                      height: 24,
-                      endIndent: 8,
-                    ),
-
-                    // Complaints List
-                    provider.isLoading
-                        ? Center(child: CircularProgressIndicator(color: Colors.white))
-                        : complaints.isEmpty
-                        ? Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 40),
-                      child: Center(
-                        child: Column(
-                          children: [
-                            Icon(Icons.inbox, size: 48, color: Colors.white54),
-                            SizedBox(height: 16),
-                            Text(
-                              "No complaints found",
-                              style: TextStyle(
-                                color: Colors.white54,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
-                        : ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: complaints.length,
-                      itemBuilder: (_, i) => Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: _ComplaintCard(
-                          complaint: complaints[i],
-                          isDarkMode: isDarkMode,
-                        ),
-                      ),
-                    ),
-
-                    SizedBox(height: 36),
-
-                    // Management Section Header
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Row(
-                        children: [
-                          Icon(Icons.settings, color: Colors.white, size: 26),
-                          SizedBox(width: 10),
-                          Text(
-                            "Management",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    Divider(
-                      color: Colors.white54,
-                      thickness: 1,
-                      height: 24,
-                      endIndent: 8,
-                    ),
-
-                    // Management Options - Responsive grid
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        final crossAxisCount = constraints.maxWidth > 600 ? 2 : 1;
-                        return GridView.count(
+                        )
+                            : ListView.builder(
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
-                          crossAxisCount: crossAxisCount,
-                          childAspectRatio: crossAxisCount == 1 ? 1.8 : 2.2,
+                          itemCount: complaints.length,
+                          itemBuilder: (_, i) => Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: _ComplaintCard(
+                              complaint: complaints[i],
+                              isDarkMode: isDarkMode,
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(height: 36),
+
+                        // Management Section Header
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Row(
+                            children: [
+                              Icon(Icons.settings, color: Colors.white, size: 26),
+                              SizedBox(width: 10),
+                              Text(
+                                "Management",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        Divider(
+                          color: Colors.white54,
+                          thickness: 1,
+                          height: 24,
+                          endIndent: 8,
+                        ),
+
+                        // Management Options - Responsive grid
+                        GridView.count(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          crossAxisCount: isMobile ? 1 : 2,
+                          childAspectRatio: isMobile ? 1.8 : 2.2,
                           crossAxisSpacing: 16,
                           mainAxisSpacing: 16,
                           children: [
@@ -370,13 +399,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                               color: Color(0xFF0F9D58),
                               route: '/admin/batch-management',
                             ),
-                            _ManagementOptionCard(
-                              icon: Icons.account_box,
-                              title: 'HODs',
-                              subtitle: 'Create HOD Accounts',
-                              color: Color(0xFFF4B400),
-                              route: '/admin/hod-management',
-                            ),
+
                             _ManagementOptionCard(
                               icon: Icons.people,
                               title: 'Users',
@@ -385,12 +408,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
                               route: '/admin/user-management',
                             ),
                           ],
-                        );
-                      },
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              },
             );
           },
         ),
@@ -459,6 +482,8 @@ class _StatCard extends StatelessWidget {
     );
   }
 }
+
+// Keep the _ComplaintCard, _UserInfoRow, and _ManagementOptionCard classes the same as in previous code
 
 class _ComplaintCard extends StatelessWidget {
   final dynamic complaint;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 import '../models/complaint.dart';
 import '../services/supabase_service.dart';
 import '../providers/auth_provider.dart';
@@ -10,19 +11,57 @@ class ComplaintForm extends StatefulWidget {
   State<ComplaintForm> createState() => _ComplaintFormState();
 }
 
-class _ComplaintFormState extends State<ComplaintForm> {
+class _ComplaintFormState extends State<ComplaintForm> with SingleTickerProviderStateMixin {
   final titleCtrl = TextEditingController();
   final descCtrl = TextEditingController();
   final imgCtrl = TextEditingController();
   final vidCtrl = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
   bool _isSubmitting = false;
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<double> _scaleAnimation;
+  bool _showImageHint = false;
+  bool _showVideoHint = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 800),
+    );
+    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeInOut,
+      ),
+    );
+    _scaleAnimation = Tween<double>(begin: 0.95, end: 1).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.elasticOut,
+      ),
+    );
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    titleCtrl.dispose();
+    descCtrl.dispose();
+    imgCtrl.dispose();
+    vidCtrl.dispose();
+    super.dispose();
+  }
 
   Future<String?> _fetchAdvisorId(String batchId) async {
     return await SupabaseService.getAdvisorIdForBatch(batchId);
   }
 
   bool _validateFields() {
-    if (titleCtrl.text.isEmpty || descCtrl.text.isEmpty) return false;
+    if (!_formKey.currentState!.validate()) return false;
     if (imgCtrl.text.isNotEmpty && !imgCtrl.text.contains('drive.google.com')) return false;
     if (vidCtrl.text.isNotEmpty && !vidCtrl.text.contains('drive.google.com')) return false;
     return true;
@@ -30,50 +69,260 @@ class _ComplaintFormState extends State<ComplaintForm> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
     final user = Provider.of<AuthProvider>(context).user!;
+
     return Scaffold(
-      appBar: AppBar(title: Text("Submit Complaint")),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(controller: titleCtrl, decoration: InputDecoration(labelText: "Title")),
-            TextField(controller: descCtrl, decoration: InputDecoration(labelText: "Description")),
-            TextField(controller: imgCtrl, decoration: InputDecoration(labelText: "Image URL (Google Drive)")),
-            TextField(controller: vidCtrl, decoration: InputDecoration(labelText: "Video URL (Google Drive)")),
-            SizedBox(height: 20),
-            _isSubmitting
-                ? CircularProgressIndicator()
-                : ElevatedButton(
-                    onPressed: () async {
-                      if (!_validateFields()) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Please fill all fields correctly.')),
-                        );
-                        return;
-                      }
+      appBar: AppBar(
+        systemOverlayStyle: SystemUiOverlayStyle.light,
+        title: Text(
+          "Submit Complaint",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                theme.primaryColor,
+                theme.primaryColor.withOpacity(0.8),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+        ),
+        elevation: 0,
+        iconTheme: IconThemeData(color: Colors.white),
+      ),
+      body: AnimatedBuilder(
+        animation: _animationController,
+        builder: (context, child) {
+          return FadeTransition(
+            opacity: _fadeAnimation,
+            child: Transform.scale(
+              scale: _scaleAnimation.value,
+              child: child,
+            ),
+          );
+        },
+        child: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
+          padding: EdgeInsets.all(20),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Title Field
+                TextFormField(
+                  controller: titleCtrl,
+                  decoration: InputDecoration(
+                    labelText: "Title",
+                    prefixIcon: Icon(Icons.title),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    filled: true,
+                    fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a title';
+                    }
+                    return null;
+                  },
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : Colors.black87,
+                  ),
+                ),
+                SizedBox(height: 20),
+
+                // Description Field
+                TextFormField(
+                  controller: descCtrl,
+                  maxLines: 5,
+                  decoration: InputDecoration(
+                    labelText: "Description",
+                    alignLabelWithHint: true,
+                    prefixIcon: Icon(Icons.description),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    filled: true,
+                    fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a description';
+                    }
+                    if (value.length < 20) {
+                      return 'Description should be at least 20 characters';
+                    }
+                    return null;
+                  },
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : Colors.black87,
+                  ),
+                ),
+                SizedBox(height: 20),
+
+                // Image URL Field
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextFormField(
+                      controller: imgCtrl,
+                      decoration: InputDecoration(
+                        labelText: "Image URL (Google Drive)",
+                        prefixIcon: Icon(Icons.image),
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.info_outline),
+                          onPressed: () {
+                            setState(() {
+                              _showImageHint = !_showImageHint;
+                            });
+                          },
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                        fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+                      ),
+                      validator: (value) {
+                        if (value != null && value.isNotEmpty && !value.contains('drive.google.com')) {
+                          return 'Please enter a valid Google Drive URL';
+                        }
+                        return null;
+                      },
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                    if (_showImageHint)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8, left: 8),
+                        child: Text(
+                          'Upload image to Google Drive and paste the shareable link here',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                SizedBox(height: 20),
+
+                // Video URL Field
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextFormField(
+                      controller: vidCtrl,
+                      decoration: InputDecoration(
+                        labelText: "Video URL (Google Drive)",
+                        prefixIcon: Icon(Icons.video_library),
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.info_outline),
+                          onPressed: () {
+                            setState(() {
+                              _showVideoHint = !_showVideoHint;
+                            });
+                          },
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                        fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+                      ),
+                      validator: (value) {
+                        if (value != null && value.isNotEmpty && !value.contains('drive.google.com')) {
+                          return 'Please enter a valid Google Drive URL';
+                        }
+                        return null;
+                      },
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                    if (_showVideoHint)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8, left: 8),
+                        child: Text(
+                          'Upload video to Google Drive and paste the shareable link here',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                SizedBox(height: 30),
+
+                // Submit Button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.primaryColor,
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 4,
+                      shadowColor: theme.primaryColor.withOpacity(0.3),
+                    ),
+                    onPressed: _isSubmitting
+                        ? null
+                        : () async {
+                      if (!_validateFields()) return;
+
                       setState(() => _isSubmitting = true);
                       try {
                         final advisorId = await _fetchAdvisorId(user.batchId);
                         if (advisorId == null || advisorId.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Advisor not found for your batch.')),
+                            SnackBar(
+                              content: Text('Advisor not found for your batch.'),
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
                           );
                           setState(() => _isSubmitting = false);
                           return;
                         }
+
                         if (user.id.isEmpty || user.batchId.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Student or batch ID missing.')),
+                            SnackBar(
+                              content: Text('Student or batch ID missing.'),
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
                           );
                           setState(() => _isSubmitting = false);
                           return;
                         }
+
                         // Fetch HOD id for student's department
                         String? hodId;
                         if (user.departmentId.isNotEmpty) {
-                          hodId = await SupabaseService.getHodIdForDepartment(user.departmentId);
+                          hodId = await SupabaseService.getHodIdForDepartment(
+                              user.departmentId);
                         }
+
                         final complaint = Complaint(
                           id: null, // Let backend generate the ID
                           title: titleCtrl.text,
@@ -88,31 +337,60 @@ class _ComplaintFormState extends State<ComplaintForm> {
                           createdAt: DateTime.now(),
                           updatedAt: DateTime.now(),
                         );
+
                         await SupabaseService.createComplaint(complaint.toMap());
                         // Refresh complaints after submission
                         await Provider.of<ComplaintProvider>(context, listen: false)
                             .fetchComplaints(user.id, 'student');
-                        setState(() => _isSubmitting = false);
+
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Complaint submitted successfully!')),
+                          SnackBar(
+                            content: Text('Complaint submitted successfully!'),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
                         );
                         Navigator.pop(context);
                       } catch (e) {
-                        setState(() => _isSubmitting = false);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Submission failed: \\${e.toString()}')),
+                          SnackBar(
+                            content: Text('Submission failed: ${e.toString()}'),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
                         );
+                      } finally {
+                        setState(() => _isSubmitting = false);
                       }
                     },
-                    child: Text("Submit"),
-                  )
-          ],
+                    child: _isSubmitting
+                        ? SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3,
+                        color: Colors.white,
+                      ),
+                    )
+                        : Text(
+                      "SUBMIT COMPLAINT",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 }
-
-// TODOs:
-// - Validation: Ensure image/video URLs are valid Google Drive links
-// - Notifications: Show success/failure notification on complaint submission

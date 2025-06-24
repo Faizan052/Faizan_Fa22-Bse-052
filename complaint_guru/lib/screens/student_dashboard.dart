@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 import '../providers/auth_provider.dart';
 import '../providers/complaint_provider.dart';
 import 'complaint_form.dart';
@@ -11,7 +12,7 @@ class StudentDashboard extends StatefulWidget {
   State<StudentDashboard> createState() => _StudentDashboardState();
 }
 
-class _StudentDashboardState extends State<StudentDashboard> {
+class _StudentDashboardState extends State<StudentDashboard> with SingleTickerProviderStateMixin {
   String _selectedStatus = 'All';
   static const List<String> _statusOptions = [
     'All',
@@ -20,10 +21,31 @@ class _StudentDashboardState extends State<StudentDashboard> {
     'Rejected',
     'Escalated to HOD',
   ];
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeInOut,
+      ),
+    );
+    _scaleAnimation = Tween<double>(begin: 0.95, end: 1).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.elasticOut,
+      ),
+    );
+    _animationController.forward();
+
     final user = Provider.of<AuthProvider>(context, listen: false).user;
     if (user != null) {
       Provider.of<ComplaintProvider>(context, listen: false)
@@ -32,27 +54,66 @@ class _StudentDashboardState extends State<StudentDashboard> {
   }
 
   @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
+    final primaryColor = theme.primaryColor;
+    final isMobile = MediaQuery.of(context).size.width < 600;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
+        systemOverlayStyle: SystemUiOverlayStyle.light,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text(
-          "Student Dashboard",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 22,
-            color: Colors.white,
+        title: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          child: Text(
+            "Student Dashboard",
+            key: ValueKey<String>(isDarkMode ? "dark" : "light"),
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+              color: Colors.white,
+              shadows: [
+                Shadow(
+                  color: Colors.black26,
+                  blurRadius: 4,
+                  offset: Offset(1, 1),
+                ),
+              ],
+            ),
           ),
         ),
         centerTitle: true,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                primaryColor.withOpacity(0.8),
+                primaryColor.withOpacity(0.4),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+        ),
         actions: [
           IconButton(
-            icon: Icon(Icons.logout, color: Colors.white),
+            icon: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: Icon(
+                Icons.logout,
+                key: ValueKey<String>(isDarkMode ? "dark" : "light"),
+                color: Colors.white,
+              ),
+            ),
             tooltip: 'Logout',
             onPressed: () async {
               await Provider.of<AuthProvider>(context, listen: false).logout();
@@ -61,277 +122,480 @@ class _StudentDashboardState extends State<StudentDashboard> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: theme.primaryColor,
-        child: Icon(Icons.add, color: Colors.white, size: 28),
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => ComplaintForm()),
-        ),
-      ),
-      body: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: isDarkMode
-                ? [Color(0xFF0F2027), Color(0xFF203A43), Color(0xFF2C5364)]
-                : [Color(0xFF4F8FFF), Color(0xFF1CB5E0), Color(0xFF0F2027)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+      floatingActionButton: ScaleTransition(
+        scale: _scaleAnimation,
+        child: FloatingActionButton(
+          backgroundColor: primaryColor,
+          elevation: 8,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: const Icon(Icons.add, color: Colors.white, size: 28),
+          onPressed: () => Navigator.push(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (_, __, ___) => ComplaintForm(),
+              transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+            ),
           ),
         ),
-        child: Consumer<ComplaintProvider>(
-          builder: (context, provider, _) {
-            if (provider.isLoading) {
-              return Center(
-                child: CircularProgressIndicator(color: Colors.white),
-              );
-            }
-
-            final complaints = provider.complaints;
-            final total = complaints.length;
-            final resolved = complaints.where((c) => c.status == 'Resolved').length;
-            final pending = complaints.where((c) => c.status == 'Submitted' || c.status == 'In Progress').length;
-            final rejected = complaints.where((c) => c.status == 'Rejected').length;
-
-            final filteredComplaints = complaints.where((c) {
-              if (_selectedStatus == 'All') return true;
-              if (_selectedStatus == 'Pending') return c.status == 'Submitted' || c.status == 'In Progress';
-              return c.status == _selectedStatus;
-            }).toList();
-
-            return SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(16, 100, 16, 32),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Stats Cards
-                  GridView.count(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    crossAxisCount: 2,
-                    childAspectRatio: 1.4,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    children: [
-                      _StatCard(
-                        icon: Icons.list_alt,
-                        value: total,
-                        label: 'Total',
-                        color: Color(0xFF4285F4),
-                      ),
-                      _StatCard(
-                        icon: Icons.check_circle,
-                        value: resolved,
-                        label: 'Resolved',
-                        color: Color(0xFF0F9D58),
-                      ),
-                      _StatCard(
-                        icon: Icons.hourglass_bottom,
-                        value: pending,
-                        label: 'Pending',
-                        color: Color(0xFFF4B400),
-                      ),
-                      _StatCard(
-                        icon: Icons.cancel,
-                        value: rejected,
-                        label: 'Rejected',
-                        color: Color(0xFFDB4437),
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: 24),
-
-                  // Filter Section
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: isDarkMode ? Colors.grey[800] : Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                      BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 6,
-                      offset: Offset(0, 2)),
-                      ],
+      ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 500),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: isDarkMode
+                    ? [
+                  const Color(0xFF0F2027),
+                  const Color(0xFF203A43),
+                  const Color(0xFF2C5364),
+                ]
+                    : [
+                  const Color(0xFF4F8FFF),
+                  const Color(0xFF1CB5E0),
+                  const Color(0xFF0F2027),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                stops: const [0.1, 0.5, 0.9],
+              ),
+            ),
+            child: Consumer<ComplaintProvider>(
+              builder: (context, provider, _) {
+                if (provider.isLoading) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 3,
                     ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.filter_alt, color: theme.primaryColor),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: DropdownButton<String>(
-                            value: _selectedStatus,
-                            items: _statusOptions.map((s) => DropdownMenuItem(
-                              value: s,
-                              child: Text(
-                                s,
-                                style: TextStyle(
-                                  color: isDarkMode ? Colors.white : Colors.black87,
+                  );
+                }
+
+                final complaints = provider.complaints;
+                final total = complaints.length;
+                final resolved = complaints.where((c) => c.status == 'Resolved').length;
+                final pending = complaints.where((c) => c.status == 'Submitted' || c.status == 'In Progress').length;
+                final rejected = complaints.where((c) => c.status == 'Rejected').length;
+
+                final filteredComplaints = complaints.where((c) {
+                  if (_selectedStatus == 'All') return true;
+                  if (_selectedStatus == 'Pending') return c.status == 'Submitted' || c.status == 'In Progress';
+                  return c.status == _selectedStatus;
+                }).toList();
+
+                return SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(16, 100, 16, 100),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight - 100,
+                    ),
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Stats Cards - Responsive layout
+                          if (isMobile)
+                            Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: StatCard(
+                                        icon: Icons.list_alt,
+                                        value: total,
+                                        label: 'Total',
+                                        color: const Color(0xFF4285F4),
+                                        animationDelay: 0,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: StatCard(
+                                        icon: Icons.check_circle,
+                                        value: resolved,
+                                        label: 'Resolved',
+                                        color: const Color(0xFF0F9D58),
+                                        animationDelay: 100,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: StatCard(
+                                        icon: Icons.hourglass_bottom,
+                                        value: pending,
+                                        label: 'Pending',
+                                        color: const Color(0xFFF4B400),
+                                        animationDelay: 200,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: StatCard(
+                                        icon: Icons.cancel,
+                                        value: rejected,
+                                        label: 'Rejected',
+                                        color: const Color(0xFFDB4437),
+                                        animationDelay: 300,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            )
+                          else
+                            GridView.count(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              crossAxisCount: 4,
+                              childAspectRatio: 1.4,
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 16,
+                              children: [
+                                StatCard(
+                                  icon: Icons.list_alt,
+                                  value: total,
+                                  label: 'Total',
+                                  color: const Color(0xFF4285F4),
+                                  animationDelay: 0,
+                                ),
+                                StatCard(
+                                  icon: Icons.check_circle,
+                                  value: resolved,
+                                  label: 'Resolved',
+                                  color: const Color(0xFF0F9D58),
+                                  animationDelay: 100,
+                                ),
+                                StatCard(
+                                  icon: Icons.hourglass_bottom,
+                                  value: pending,
+                                  label: 'Pending',
+                                  color: const Color(0xFFF4B400),
+                                  animationDelay: 200,
+                                ),
+                                StatCard(
+                                  icon: Icons.cancel,
+                                  value: rejected,
+                                  label: 'Rejected',
+                                  color: const Color(0xFFDB4437),
+                                  animationDelay: 300,
+                                ),
+                              ],
+                            ),
+
+                          const SizedBox(height: 24),
+
+                          // Filter Section
+                          ScaleTransition(
+                            scale: _scaleAnimation,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: isDarkMode ? Colors.black.withOpacity(0.3) : Colors.white.withOpacity(0.9),
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 12,
+                                    spreadRadius: 2,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.filter_alt, color: primaryColor),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: MouseRegion(
+                                      cursor: SystemMouseCursors.click,
+                                      child: DropdownButton<String>(
+                                        value: _selectedStatus,
+                                        items: _statusOptions.map((s) => DropdownMenuItem(
+                                          value: s,
+                                          child: Text(
+                                            s,
+                                            style: TextStyle(
+                                              color: isDarkMode ? Colors.white : Colors.black87,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        )).toList(),
+                                        onChanged: (val) => setState(() => _selectedStatus = val!),
+                                        underline: const SizedBox(),
+                                        isExpanded: true,
+                                        dropdownColor: isDarkMode ? Colors.grey[900] : Colors.white,
+                                        icon: Icon(Icons.arrow_drop_down, color: primaryColor),
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: isDarkMode ? Colors.white : Colors.black87,
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          // Complaints List Header
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Row(
+                              children: [
+                                Icon(Icons.report_problem, color: Colors.white, size: 26),
+                                const SizedBox(width: 10),
+                                Text(
+                                  "Your Complaints",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                    color: Colors.white,
+                                    shadows: [
+                                      Shadow(
+                                        color: Colors.black.withOpacity(0.3),
+                                        blurRadius: 4,
+                                        offset: const Offset(1, 1),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          Divider(
+                            color: Colors.white.withOpacity(0.3),
+                            thickness: 1,
+                            height: 24,
+                            endIndent: 8,
+                          ),
+
+                          // Complaints List
+                          if (filteredComplaints.isEmpty)
+                            FadeTransition(
+                              opacity: _fadeAnimation,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 40),
+                                child: Center(
+                                  child: Column(
+                                    children: [
+                                      Icon(Icons.inbox, size: 48, color: Colors.white.withOpacity(0.5)),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        _selectedStatus == 'All'
+                                            ? "You haven't filed any complaints yet"
+                                            : "No ${_selectedStatus.toLowerCase()} complaints",
+                                        style: TextStyle(
+                                          color: Colors.white.withOpacity(0.7),
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'Tap the + button to create a new complaint',
+                                        style: TextStyle(
+                                          color: Colors.white.withOpacity(0.7),
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            )).toList(),
-                            onChanged: (val) => setState(() => _selectedStatus = val!),
-                            underline: SizedBox(),
-                            isExpanded: true,
-                            dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
-                            icon: Icon(Icons.arrow_drop_down, color: theme.primaryColor),
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: isDarkMode ? Colors.white : Colors.black87,
+                            )
+                          else
+                            ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: filteredComplaints.length,
+                              itemBuilder: (_, index) {
+                                return FutureBuilder<Map<String, String?>>(
+                                  future: _getUserNames(filteredComplaints[index]),
+                                  builder: (context, snapshot) {
+                                    final advisorName = snapshot.data?['advisor'] ?? filteredComplaints[index].advisorId;
+                                    final hodName = snapshot.data?['hod'];
+                                    return ComplaintCard(
+                                      complaint: filteredComplaints[index],
+                                      isDarkMode: isDarkMode,
+                                      primaryColor: primaryColor,
+                                      advisorName: advisorName,
+                                      hodName: hodName,
+                                    );
+                                  },
+                                );
+                              },
                             ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  SizedBox(height: 24),
-
-                  // Complaints List Header
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Row(
-                      children: [
-                        Icon(Icons.report_problem, color: Colors.white, size: 26),
-                        SizedBox(width: 10),
-                        Text(
-                          "Your Complaints",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  Divider(
-                    color: Colors.white54,
-                    thickness: 1,
-                    height: 24,
-                    endIndent: 8,
-                  ),
-
-                  // Complaints List
-                  if (filteredComplaints.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 40),
-                      child: Center(
-                        child: Column(
-                          children: [
-                            Icon(Icons.inbox, size: 48, color: Colors.white54),
-                            SizedBox(height: 16),
-                            Text(
-                              _selectedStatus == 'All'
-                                  ? "You haven't filed any complaints yet"
-                                  : "No ${_selectedStatus.toLowerCase()} complaints",
-                              style: TextStyle(
-                                color: Colors.white54,
-                                fontSize: 16,
-                              ),
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              'Tap the + button to create a new complaint',
-                              style: TextStyle(
-                                color: Colors.white54,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
+                        ],
                       ),
-                    )
-                  else
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: filteredComplaints.length,
-                      itemBuilder: (_, index) {
-                        final complaint = filteredComplaints[index];
-                        return _ComplaintCard(
-                          complaint: complaint,
-                          isDarkMode: isDarkMode,
-                        );
-                      },
                     ),
-                ],
-              ),
-            );
-          },
-        ),
+                  ),
+                );
+              },
+            ),
+          );
+        },
       ),
     );
   }
+
+  Future<Map<String, String?>> _getUserNames(dynamic complaint) async {
+    final advisorName = await UserLookupService.getUserName(complaint.advisorId);
+    String? hodName;
+    if (complaint.hodId != null && complaint.hodId!.isNotEmpty) {
+      hodName = await UserLookupService.getUserName(complaint.hodId!);
+    }
+    return {
+      'advisor': advisorName,
+      'hod': hodName,
+    };
+  }
 }
 
-class _StatCard extends StatelessWidget {
+class StatCard extends StatefulWidget {
   final IconData icon;
   final int value;
   final String label;
   final Color color;
+  final int animationDelay;
 
-  const _StatCard({
+  const StatCard({
     required this.icon,
     required this.value,
     required this.label,
     required this.color,
+    required this.animationDelay,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+  State<StatCard> createState() => _StatCardState();
+}
+
+class _StatCardState extends State<StatCard> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scale;
+  late Animation<double> _opacity;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    _scale = Tween<double>(begin: 0.8, end: 1).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.elasticOut,
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                shape: BoxShape.circle,
+    );
+
+    _opacity = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeIn,
+      ),
+    );
+
+    Future.delayed(Duration(milliseconds: widget.animationDelay), () {
+      if (mounted) _controller.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ScaleTransition(
+      scale: _scale,
+      child: FadeTransition(
+        opacity: _opacity,
+        child: Card(
+          elevation: 6,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          color: Theme.of(context).cardColor,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () {},
+            splashColor: widget.color.withOpacity(0.1),
+            highlightColor: widget.color.withOpacity(0.05),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          widget.color.withOpacity(0.2),
+                          widget.color.withOpacity(0.1),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(widget.icon, size: 24, color: widget.color),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    widget.value.toString(),
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: widget.color,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    widget.label,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(context).textTheme.bodyLarge?.color?.withOpacity(0.7),
+                    ),
+                  ),
+                ],
               ),
-              child: Icon(icon, size: 24, color: color),
             ),
-            SizedBox(height: 12),
-            Text(
-              value.toString(),
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
-            ),
-            SizedBox(height: 6),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                color: Theme.of(context).textTheme.bodyLarge?.color?.withOpacity(0.7),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _ComplaintCard extends StatelessWidget {
+class ComplaintCard extends StatelessWidget {
   final dynamic complaint;
   final bool isDarkMode;
+  final Color primaryColor;
+  final String advisorName;
+  final String? hodName;
 
-  const _ComplaintCard({
+  const ComplaintCard({
     required this.complaint,
     required this.isDarkMode,
+    required this.primaryColor,
+    required this.advisorName,
+    this.hodName,
   });
 
   Color _getStatusColor(String status) {
@@ -356,21 +620,24 @@ class _ComplaintCard extends StatelessWidget {
     final isRejected = complaint.status == 'Rejected';
 
     return Card(
-      margin: EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 16),
       elevation: 4,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (_) => ComplaintHistory(complaintId: complaint.id!),
+            PageRouteBuilder(
+              pageBuilder: (_, __, ___) => ComplaintHistory(complaintId: complaint.id!),
+              transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
             ),
           );
         },
+        splashColor: primaryColor.withOpacity(0.1),
+        highlightColor: primaryColor.withOpacity(0.05),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -383,7 +650,7 @@ class _ComplaintCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       complaint.title,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                         color: Colors.black87,
@@ -394,7 +661,7 @@ class _ComplaintCard extends StatelessWidget {
                   ),
                   Text(
                     complaint.createdAt.toLocal().toString().split(" ").first,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 12,
                       color: Colors.grey,
                     ),
@@ -402,14 +669,22 @@ class _ComplaintCard extends StatelessWidget {
                 ],
               ),
 
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
 
               // Status badge
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
+                  gradient: LinearGradient(
+                    colors: [
+                      statusColor.withOpacity(0.1),
+                      statusColor.withOpacity(0.05),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: statusColor.withOpacity(0.3)),
                 ),
                 child: Text(
                   complaint.status,
@@ -421,12 +696,12 @@ class _ComplaintCard extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
 
               // Resolution status if applicable
               if (isResolved || isRejected)
                 Container(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: statusColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
@@ -438,7 +713,7 @@ class _ComplaintCard extends StatelessWidget {
                         color: statusColor,
                         size: 20,
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Text(
                         isResolved ? 'Resolved successfully' : 'Complaint rejected',
                         style: TextStyle(
@@ -450,37 +725,42 @@ class _ComplaintCard extends StatelessWidget {
                   ),
                 ),
 
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
 
               // User information
-              _UserInfoRow(
+              UserInfoRow(
                 icon: Icons.school,
                 label: 'Advisor',
-                id: complaint.advisorId,
+                name: advisorName,
               ),
-              if (complaint.hodId != null && complaint.hodId!.isNotEmpty)
-                _UserInfoRow(
+              if (hodName != null)
+                UserInfoRow(
                   icon: Icons.engineering,
                   label: 'HOD',
-                  id: complaint.hodId!,
+                  name: hodName!,
                 ),
 
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
 
               // View History button
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton.icon(
-                  icon: Icon(Icons.history, size: 16),
-                  label: Text('View History'),
+                  icon: const Icon(Icons.history, size: 16),
+                  label: const Text('View History'),
                   style: TextButton.styleFrom(
-                    foregroundColor: Theme.of(context).primaryColor,
+                    foregroundColor: primaryColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   ),
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (_) => ComplaintHistory(complaintId: complaint.id!),
+                      PageRouteBuilder(
+                        pageBuilder: (_, __, ___) => ComplaintHistory(complaintId: complaint.id!),
+                        transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
                       ),
                     );
                   },
@@ -494,45 +774,40 @@ class _ComplaintCard extends StatelessWidget {
   }
 }
 
-class _UserInfoRow extends StatelessWidget {
+class UserInfoRow extends StatelessWidget {
   final IconData icon;
   final String label;
-  final String id;
+  final String name;
 
-  const _UserInfoRow({
+  const UserInfoRow({
     required this.icon,
     required this.label,
-    required this.id,
+    required this.name,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
-      child: FutureBuilder<String>(
-        future: UserLookupService.getUserName(id),
-        builder: (context, snapshot) {
-          return Row(
-            children: [
-              Icon(icon, size: 16, color: Colors.grey),
-              SizedBox(width: 8),
-              Text(
-                '$label: ',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey,
-                ),
-              ),
-              Text(
-                snapshot.data ?? id,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.black87,
-                ),
-              ),
-            ],
-          );
-        },
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: Colors.grey),
+          const SizedBox(width: 8),
+          Text(
+            '$label: ',
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.grey,
+            ),
+          ),
+          Text(
+            name,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.black87,
+            ),
+          ),
+        ],
       ),
     );
   }
