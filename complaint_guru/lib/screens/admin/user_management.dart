@@ -243,87 +243,118 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
           ),
           child: Padding(
             padding: const EdgeInsets.all(26.0),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.person, color: mainBlue, size: 30),
-                      const SizedBox(width: 12),
-                      ShaderMask(
-                        shaderCallback: (rect) => LinearGradient(
-                          colors: [mainBlue, accentBlue],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ).createShader(rect),
-                        child: Text(
-                          user == null ? 'Add New User' : 'Edit User',
-                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 1.1, color: Colors.white),
+            child: Form(
+              key: GlobalKey<FormState>(),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.person, color: mainBlue, size: 30),
+                        const SizedBox(width: 12),
+                        ShaderMask(
+                          shaderCallback: (rect) => LinearGradient(
+                            colors: [mainBlue, accentBlue],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ).createShader(rect),
+                          child: Text(
+                            user == null ? 'Add New User' : 'Edit User',
+                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 1.1, color: Colors.white),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  buildFormField(nameCtrl, 'Name', icon: Icons.person_outline, mainBlue: mainBlue, accentBlue: accentBlue),
-                  const SizedBox(height: 14),
-                  buildFormField(emailCtrl, 'Email', icon: Icons.email_outlined, mainBlue: mainBlue, accentBlue: accentBlue),
-                  if (user == null) ...[
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    buildFormField(nameCtrl, 'Name', icon: Icons.person_outline, mainBlue: mainBlue, accentBlue: accentBlue),
                     const SizedBox(height: 14),
-                    buildFormField(passwordCtrl, 'Password', obscureText: true, icon: Icons.lock_outline, mainBlue: mainBlue, accentBlue: accentBlue),
-                  ],
-                  const SizedBox(height: 14),
-                  buildRoleDropdown(roleValue, (val) => roleValue = val!, mainBlue: mainBlue, accentBlue: accentBlue),
-                  const SizedBox(height: 14),
-                  buildFormField(batchCtrl, 'Batch ID (optional)', icon: Icons.group_outlined, mainBlue: mainBlue, accentBlue: accentBlue),
-                  const SizedBox(height: 14),
-                  buildFormField(deptCtrl, 'Department ID (optional)', icon: Icons.apartment_outlined, mainBlue: mainBlue, accentBlue: accentBlue),
-                  const SizedBox(height: 30),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(ctx),
-                        style: TextButton.styleFrom(foregroundColor: mainBlue),
-                        child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.bold)),
-                      ),
-                      const SizedBox(width: 18),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: mainBlue,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                          elevation: 3,
-                        ),
-                        onPressed: () async {
-                          if (user == null) {
-                            await SupabaseService.registerUserWithAuth(
-                              name: nameCtrl.text,
-                              email: emailCtrl.text,
-                              password: passwordCtrl.text,
-                              role: roleValue,
-                              batchId: batchCtrl.text,
-                              departmentId: deptCtrl.text,
-                            );
-                          } else {
-                            await SupabaseService.updateUser(user.id, {
-                              'name': nameCtrl.text,
-                              'email': emailCtrl.text,
-                              'role': roleValue,
-                              'batch_id': batchCtrl.text.isNotEmpty ? batchCtrl.text : null,
-                              'department_id': deptCtrl.text.isNotEmpty ? deptCtrl.text : null,
-                            });
-                          }
-                          Navigator.pop(ctx);
-                          fetchUsers();
-                        },
-                        child: const Text('Save', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17, letterSpacing: 0.6)),
-                      ),
+                    buildFormField(emailCtrl, 'Email', icon: Icons.email_outlined, mainBlue: mainBlue, accentBlue: accentBlue),
+                    if (user == null) ...[
+                      const SizedBox(height: 14),
+                      buildFormField(passwordCtrl, 'Password', obscureText: true, icon: Icons.lock_outline, mainBlue: mainBlue, accentBlue: accentBlue),
                     ],
-                  ),
-                ],
+                    const SizedBox(height: 14),
+                    buildRoleDropdown(roleValue, (val) => roleValue = val!, mainBlue: mainBlue, accentBlue: accentBlue),
+                    const SizedBox(height: 14),
+                    buildFormField(batchCtrl, 'Batch ID (optional)', icon: Icons.group_outlined, mainBlue: mainBlue, accentBlue: accentBlue),
+                    const SizedBox(height: 14),
+                    buildFormField(deptCtrl, 'Department ID (optional)', icon: Icons.apartment_outlined, mainBlue: mainBlue, accentBlue: accentBlue),
+                    const SizedBox(height: 30),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          style: TextButton.styleFrom(foregroundColor: mainBlue),
+                          child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                        const SizedBox(width: 18),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: mainBlue,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            elevation: 3,
+                          ),
+                          onPressed: () async {
+                            if (nameCtrl.text.trim().isEmpty || emailCtrl.text.trim().isEmpty || (user == null && passwordCtrl.text.trim().isEmpty)) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Please fill all required fields.'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                              return;
+                            }
+                            try {
+                              if (user == null) {
+                                await SupabaseService.registerUserWithAuthClient(
+                                  name: nameCtrl.text,
+                                  email: emailCtrl.text,
+                                  password: passwordCtrl.text,
+                                  role: roleValue,
+                                  batchId: batchCtrl.text,
+                                  departmentId: deptCtrl.text,
+                                );
+                              } else {
+                                await SupabaseService.updateUser(user.id, {
+                                  'name': nameCtrl.text,
+                                  'email': emailCtrl.text,
+                                  'role': roleValue,
+                                  'batch_id': batchCtrl.text.isNotEmpty ? batchCtrl.text : null,
+                                  'department_id': deptCtrl.text.isNotEmpty ? deptCtrl.text : null,
+                                });
+                              }
+                              Navigator.pop(ctx);
+                              fetchUsers();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('User saved successfully!'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            } catch (e) {
+                              String msg = e.toString();
+                              if (msg.contains('not_admin') || msg.contains('statusCode: 403')) {
+                                msg = 'You do not have permission to create users. Please contact your Supabase admin or use a service role key.';
+                              }
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Failed to save user: ' + msg),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          },
+                          child: const Text('Save', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17, letterSpacing: 0.6)),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -437,9 +468,29 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                       backgroundColor: Theme.of(context).colorScheme.error,
                     ),
                     onPressed: () async {
-                      await SupabaseService.deleteUser(user.id);
-                      Navigator.pop(ctx);
-                      fetchUsers();
+                      try {
+                        await SupabaseService.deleteUserWithAuthClient(user.id);
+                        Navigator.pop(ctx);
+                        fetchUsers();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('User deleted successfully!'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      } catch (e) {
+                        Navigator.pop(ctx);
+                        String msg = e.toString();
+                        if (msg.contains('not_admin') || msg.contains('statusCode: 403')) {
+                          msg = 'You do not have permission to delete users. Please contact your Supabase admin or use a service role key.';
+                        }
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Failed to delete user: ' + msg),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
                     },
                     child: Text(
                       'Delete',
@@ -645,7 +696,7 @@ class _UserCardState extends State<UserCard> {
                     ),
                     const SizedBox(height: 10),
                     if (user.batchId.isNotEmpty)
-                      loadingNames
+                      (loadingNames)
                         ? Row(children: [SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)), SizedBox(width: 8), Text('Loading batch...')])
                         : Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -656,7 +707,7 @@ class _UserCardState extends State<UserCard> {
                             ],
                           ),
                     if (user.departmentId.isNotEmpty)
-                      loadingNames
+                      (loadingNames)
                         ? Row(children: [SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)), SizedBox(width: 8), Text('Loading department...')])
                         : Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -671,12 +722,10 @@ class _UserCardState extends State<UserCard> {
                       children: [
                         IconButton(
                           icon: Icon(Icons.edit_rounded, color: mainBlue, size: 26),
-                          tooltip: 'Edit',
                           onPressed: widget.onEdit,
                         ),
                         IconButton(
                           icon: Icon(Icons.delete_forever_rounded, color: Colors.red[300], size: 26),
-                          tooltip: 'Delete',
                           onPressed: widget.onDelete,
                         ),
                       ],

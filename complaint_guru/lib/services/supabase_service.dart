@@ -182,6 +182,14 @@ class SupabaseService {
     await _adminClient.from('users').insert(userMap);
   }
 
+  /// Deletes a user from Supabase Auth and the users table using the admin client (service role).
+  static Future<void> deleteUserWithAuthClient(String userId) async {
+    // Delete from Supabase Auth
+    await _adminClient.auth.admin.deleteUser(userId);
+    // Delete from users table
+    await _adminClient.from('users').delete().eq('id', userId);
+  }
+
   // TODO: Implement real-time updates for complaints using Supabase Realtime.
   // TODO: Add notification triggers on complaint status change.
   // TODO: Explore advanced queries for filtering and searching complaints.

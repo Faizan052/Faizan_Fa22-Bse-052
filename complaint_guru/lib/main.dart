@@ -6,7 +6,6 @@ import 'providers/complaint_provider.dart';
 import 'routes/app_routes.dart';
 import 'screens/admin/department_management.dart';
 import 'screens/admin/batch_management.dart';
-
 import 'screens/admin/user_management.dart';
 
 void main() async {
@@ -43,7 +42,6 @@ class ComplaintGuruApp extends StatelessWidget {
       routes: {
         '/admin/department-management': (context) => DepartmentManagementScreen(),
         '/admin/batch-management': (context) => BatchManagementScreen(),
-        
         '/admin/user-management': (context) => UserManagementScreen(),
       },
     );
