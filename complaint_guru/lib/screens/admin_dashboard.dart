@@ -6,6 +6,7 @@ import '../services/excel_service.dart';
 import 'complaint_history.dart';
 import '../providers/auth_provider.dart';
 import '../services/user_lookup_service.dart';
+import 'dart:ui';
 
 class AdminDashboard extends StatefulWidget {
   @override
@@ -15,6 +16,8 @@ class AdminDashboard extends StatefulWidget {
 class _AdminDashboardState extends State<AdminDashboard> {
   final ExcelService excelService = ExcelService();
   String _selectedStatus = 'All';
+  bool showComplaintsList = false;
+  String _complaintSearch = '';
   static const List<String> _statusOptions = [
     'All',
     'Pending',
@@ -38,14 +41,22 @@ class _AdminDashboardState extends State<AdminDashboard> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white.withOpacity(0.08),
         elevation: 0,
         title: Text(
           "Admin Dashboard",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
-            fontSize: 22,
+            fontSize: 24,
+            letterSpacing: 1.1,
+            shadows: [
+              Shadow(
+                color: Colors.black26,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
+            ],
           ),
         ),
         centerTitle: true,
@@ -59,14 +70,21 @@ class _AdminDashboardState extends State<AdminDashboard> {
             },
           ),
         ],
+        flexibleSpace: ClipRRect(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(18)),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+            child: Container(
+              color: Colors.transparent,
+            ),
+          ),
+        ),
       ),
       body: Container(
         width: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: isDarkMode
-                ? [Color(0xFF0F2027), Color(0xFF203A43), Color(0xFF2C5364)]
-                : [Color(0xFF4F8FFF), Color(0xFF1CB5E0), Color(0xFF0F2027)],
+            colors: [Color(0xFF4F8FFF), Color(0xFF1CB5E0), Color(0xFF0F2027)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -77,6 +95,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
               if (_selectedStatus == 'All') return true;
               if (_selectedStatus == 'Pending') return c.status == 'Submitted' || c.status == 'In Progress';
               return c.status == _selectedStatus;
+            }).toList();
+
+            final _filteredComplaints = complaints.where((c) {
+              return c.title.toLowerCase().contains(_complaintSearch.toLowerCase());
             }).toList();
 
             // Statistics data
@@ -188,167 +210,60 @@ class _AdminDashboardState extends State<AdminDashboard> {
                             ],
                           ),
 
-                        SizedBox(height: 24),
-
-                        // Excel Upload Button
-                        Center(
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(maxWidth: 400),
-                            child: ElevatedButton.icon(
-                              icon: Icon(Icons.upload_file, size: 22),
-                              label: Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 12),
-                                child: Text(
-                                  "Upload Students via Excel",
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFF1976D2),
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                elevation: 4,
-                                shadowColor: Colors.black26,
-                                minimumSize: Size(double.infinity, 50),
-                              ),
-                              onPressed: () async {
-                                final result = await FilePicker.platform.pickFiles(
-                                  type: FileType.custom,
-                                  allowedExtensions: ['xlsx', 'csv'],
-                                );
-                                if (result != null) {
-                                  final file = result.files.single;
-                                  final message = await excelService.uploadStudentExcel(file);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(message),
-                                      behavior: SnackBarBehavior.floating,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
-                          ),
-                        ),
-
                         SizedBox(height: 28),
 
-                        // Filter Section
-                        ConstrainedBox(
-                          constraints: BoxConstraints(maxWidth: 400),
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            decoration: BoxDecoration(
-                              color: isDarkMode ? Colors.grey[800] : Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 6,
-                                    offset: Offset(0, 2)),
-                              ],
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(Icons.filter_alt, color: Color(0xFF4F8FFF)),
-                                SizedBox(width: 12),
-                                Expanded(
-                                  child: DropdownButton<String>(
-                                    value: _selectedStatus,
-                                    items: _statusOptions.map((s) => DropdownMenuItem(
-                                      value: s,
-                                      child: Text(
-                                        s,
-                                        style: TextStyle(
-                                          color: isDarkMode ? Colors.white : Colors.black87,
-                                        ),
-                                      ),
-                                    )).toList(),
-                                    onChanged: (val) => setState(() => _selectedStatus = val!),
-                                    underline: SizedBox(),
-                                    isExpanded: true,
-                                    dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
-                                    icon: Icon(Icons.arrow_drop_down, color: Color(0xFF4F8FFF)),
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: isDarkMode ? Colors.white : Colors.black87,
-                                    ),
+                        // Excel Upload Button
+                        Padding(
+                          padding: const EdgeInsets.only(top: 18, left: 4, right: 4, bottom: 8),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(maxWidth: 320),
+                              child: ElevatedButton.icon(
+                                icon: Icon(Icons.upload_file, size: 22),
+                                label: Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  child: Text(
+                                    "Upload Students via Excel",
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                                   ),
                                 ),
-                              ],
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Color(0xFF1976D2),
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 4,
+                                  shadowColor: Colors.black26,
+                                  minimumSize: Size(0, 48),
+                                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 0),
+                                ),
+                                onPressed: () async {
+                                  final result = await FilePicker.platform.pickFiles(
+                                    type: FileType.custom,
+                                    allowedExtensions: ['xlsx', 'csv'],
+                                  );
+                                  if (result != null) {
+                                    final file = result.files.single;
+                                    final message = await excelService.uploadStudentExcel(file);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(message),
+                                        behavior: SnackBarBehavior.floating,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
                             ),
                           ),
                         ),
 
                         SizedBox(height: 32),
-
-                        // Complaints List Header
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: Row(
-                            children: [
-                              Icon(Icons.report_problem, color: Colors.white, size: 26),
-                              SizedBox(width: 10),
-                              Text(
-                                "Complaints List",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        Divider(
-                          color: Colors.white54,
-                          thickness: 1,
-                          height: 24,
-                          endIndent: 8,
-                        ),
-
-                        // Complaints List
-                        provider.isLoading
-                            ? Center(child: CircularProgressIndicator(color: Colors.white))
-                            : complaints.isEmpty
-                            ? Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 40),
-                          child: Center(
-                            child: Column(
-                              children: [
-                                Icon(Icons.inbox, size: 48, color: Colors.white54),
-                                SizedBox(height: 16),
-                                Text(
-                                  "No complaints found",
-                                  style: TextStyle(
-                                    color: Colors.white54,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                            : ListView.builder(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: complaints.length,
-                          itemBuilder: (_, i) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: _ComplaintCard(
-                              complaint: complaints[i],
-                              isDarkMode: isDarkMode,
-                            ),
-                          ),
-                        ),
-
-                        SizedBox(height: 36),
 
                         // Management Section Header
                         Padding(
@@ -409,6 +324,165 @@ class _AdminDashboardState extends State<AdminDashboard> {
                             ),
                           ],
                         ),
+                        SizedBox(height: 40),
+
+                        // Complaints List Toggle Button (now under Management)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: Center(
+                            child: ElevatedButton.icon(
+                              icon: Icon(showComplaintsList ? Icons.visibility_off : Icons.visibility),
+                              label: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                child: Text(showComplaintsList ? "Hide Complaints List" : "Show Complaints List", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFF4F8FFF),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                elevation: 3,
+                                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                              ),
+                              onPressed: () => setState(() => showComplaintsList = !showComplaintsList),
+                            ),
+                          ),
+                        ),
+                        if (showComplaintsList) ...[
+                          SizedBox(height: 20),
+                          // Complaints Filter and Search
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                            child: Row(
+                              children: [
+                                // Search bar
+                                Expanded(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black12,
+                                          blurRadius: 6,
+                                          offset: Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: TextField(
+                                      decoration: InputDecoration(
+                                        hintText: 'Search complaints...',
+                                        prefixIcon: Icon(Icons.search, color: Color(0xFF4F8FFF)),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                          borderSide: BorderSide.none,
+                                        ),
+                                        filled: true,
+                                        fillColor: Colors.white,
+                                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                      ),
+                                      style: TextStyle(color: Color(0xFF4F8FFF), fontWeight: FontWeight.w500),
+                                      onChanged: (val) => setState(() => _complaintSearch = val),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 12),
+                                // Filter dropdown
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 6,
+                                        offset: Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  child: DropdownButton<String>(
+                                    value: _selectedStatus,
+                                    items: _statusOptions.map((s) => DropdownMenuItem(
+                                      value: s,
+                                      child: Text(
+                                        s,
+                                        style: TextStyle(color: Color(0xFF4F8FFF), fontWeight: FontWeight.w600),
+                                      ),
+                                    )).toList(),
+                                    onChanged: (val) => setState(() => _selectedStatus = val!),
+                                    underline: SizedBox(),
+                                    isExpanded: false,
+                                    dropdownColor: Colors.white,
+                                    icon: Icon(Icons.arrow_drop_down, color: Color(0xFF4F8FFF)),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 14),
+                          // Complaints List Header
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            child: Row(
+                              children: [
+                                Icon(Icons.report_problem, color: Colors.white, size: 26),
+                                SizedBox(width: 10),
+                                Text(
+                                  "Complaints List",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          Divider(
+                            color: Colors.white54,
+                            thickness: 1,
+                            height: 24,
+                            endIndent: 8,
+                          ),
+
+                          // Complaints List
+                          provider.isLoading
+                              ? Center(child: CircularProgressIndicator(color: Colors.white))
+                              : _filteredComplaints.isEmpty
+                              ? Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 40),
+                            child: Center(
+                              child: Column(
+                                children: [
+                                  Icon(Icons.inbox, size: 48, color: Colors.white54),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    "No complaints found",
+                                    style: TextStyle(
+                                      color: Colors.white54,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                              : ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: _filteredComplaints.length,
+                            itemBuilder: (_, i) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: _ComplaintCard(
+                                complaint: _filteredComplaints[i],
+                                isDarkMode: isDarkMode,
+                              ),
+                            ),
+                          ),
+                        ],
+
+                        SizedBox(height: 36),
                       ],
                     ),
                   ),

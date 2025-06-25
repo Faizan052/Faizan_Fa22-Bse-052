@@ -40,301 +40,336 @@ class _HodDashboardState extends State<HodDashboard> {
     final user = Provider.of<AuthProvider>(context).user!;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         title: Text(
           "HOD Dashboard",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
+            fontSize: 24,
+            letterSpacing: 1.1,
+            shadows: [
+              Shadow(
+                color: Colors.black26,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
+            ],
           ),
         ),
         centerTitle: true,
-        backgroundColor: primaryColor,
-        elevation: 0,
         actions: [
           IconButton(
             icon: Icon(Icons.logout, color: Colors.white),
+            tooltip: 'Logout',
             onPressed: () async {
               await Provider.of<AuthProvider>(context, listen: false).logout();
               Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
             },
           ),
         ],
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF4F8FFF), Color(0xFF1CB5E0), Color(0xFF0F2027)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
-      body: Consumer<ComplaintProvider>(
-        builder: (context, provider, _) {
-          if (provider.isLoading) {
-            return Center(
-              child: CircularProgressIndicator(
-                color: primaryColor,
-                strokeWidth: 3,
-              ),
-            );
-          }
-
-          final allComplaints = provider.complaints;
-          final escalatedComplaints = allComplaints.where((c) => c.status == 'Escalated to HOD').toList();
-          final complaints = _showAll
-              ? allComplaints.where((c) {
-            if (_selectedStatus == 'All') return true;
-            if (_selectedStatus == 'Pending') return c.status == 'Submitted' || c.status == 'In Progress';
-            return c.status == _selectedStatus;
-          }).toList()
-              : escalatedComplaints.where((c) {
-            if (_selectedStatus == 'All') return true;
-            if (_selectedStatus == 'Pending') return c.status == 'Escalated to HOD';
-            return c.status == _selectedStatus;
-          }).toList();
-
-          return Column(
-            children: [
-              // Filter and Toggle Section
-              Container(
-                padding: EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: isDarkMode ? Colors.grey[800] : Colors.grey[100],
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
+      body: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF4F8FFF), Color(0xFF1CB5E0), Color(0xFF0F2027)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: Consumer<ComplaintProvider>(
+              builder: (context, provider, _) {
+                if (provider.isLoading) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: primaryColor,
+                      strokeWidth: 3,
                     ),
-                  ],
-                ),
-                child: Column(
+                  );
+                }
+
+                final allComplaints = provider.complaints;
+                final escalatedComplaints = allComplaints.where((c) => c.status == 'Escalated to HOD').toList();
+                final complaints = _showAll
+                    ? allComplaints.where((c) {
+                  if (_selectedStatus == 'All') return true;
+                  if (_selectedStatus == 'Pending') return c.status == 'Submitted' || c.status == 'In Progress';
+                  return c.status == _selectedStatus;
+                }).toList()
+                    : escalatedComplaints.where((c) {
+                  if (_selectedStatus == 'All') return true;
+                  if (_selectedStatus == 'Pending') return c.status == 'Escalated to HOD';
+                  return c.status == _selectedStatus;
+                }).toList();
+
+                return Column(
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 12),
-                            decoration: BoxDecoration(
-                              color: isDarkMode ? Colors.grey[700] : Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: DropdownButton<String>(
-                              value: _selectedStatus,
-                              items: _statusOptions
-                                  .map((s) => DropdownMenuItem(
-                                value: s,
+                    // Filter and Toggle Section
+                    Container(
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 12),
+                                  decoration: BoxDecoration(
+                                    color: isDarkMode ? Colors.grey[700] : Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: DropdownButton<String>(
+                                    value: _selectedStatus,
+                                    items: _statusOptions
+                                        .map((s) => DropdownMenuItem(
+                                      value: s,
+                                      child: Text(
+                                        s,
+                                        style: TextStyle(
+                                          color: isDarkMode ? Colors.white : Colors.black87,
+                                        ),
+                                      ),
+                                    ))
+                                        .toList(),
+                                    onChanged: (val) => setState(() => _selectedStatus = val!),
+                                    underline: SizedBox(),
+                                    isExpanded: true,
+                                    dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
+                                    icon: Icon(Icons.arrow_drop_down, color: primaryColor),
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: isDarkMode ? Colors.white : Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 12),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: isDarkMode ? Colors.grey[700] : Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                onPressed: () => setState(() => _showAll = !_showAll),
                                 child: Text(
-                                  s,
+                                  _showAll ? 'Escalated Only' : 'All Complaints',
                                   style: TextStyle(
                                     color: isDarkMode ? Colors.white : Colors.black87,
-                                  ),
-                                ),
-                              ))
-                                  .toList(),
-                              onChanged: (val) => setState(() => _selectedStatus = val!),
-                              underline: SizedBox(),
-                              isExpanded: true,
-                              dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
-                              icon: Icon(Icons.arrow_drop_down, color: primaryColor),
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: isDarkMode ? Colors.white : Colors.black87,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 12),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: isDarkMode ? Colors.grey[700] : Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          onPressed: () => setState(() => _showAll = !_showAll),
-                          child: Text(
-                            _showAll ? 'Escalated Only' : 'All Complaints',
-                            style: TextStyle(
-                              color: isDarkMode ? Colors.white : Colors.black87,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (!_showAll)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.purple.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.purple.withOpacity(0.4)),
-                          ),
-                          child: Text(
-                            'Escalated Pending: ${escalatedComplaints.length}',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.purple[800],
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-
-              // Complaints List
-              Expanded(
-                child: complaints.isEmpty
-                    ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.inbox,
-                        size: 48,
-                        color: Colors.grey.withOpacity(0.5),
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        'No complaints found',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-                    : ListView.builder(
-                  padding: EdgeInsets.all(8),
-                  itemCount: complaints.length,
-                  itemBuilder: (_, i) {
-                    final isEscalated = complaints[i].status == 'Escalated to HOD';
-                    final isResolvedOrRejected = complaints[i].status == 'Resolved' ||
-                        complaints[i].status == 'Rejected';
-
-                    return Card(
-                      elevation: 2,
-                      margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(12),
-                        onTap: (!_showAll && isEscalated)
-                            ? () => _showActions(context, complaints[i], user.id)
-                            : null,
-                        child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      complaints[i].title,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: _getStatusColor(complaints[i].status)
-                                          .withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(
-                                        color: _getStatusColor(complaints[i].status)
-                                            .withOpacity(0.3),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      complaints[i].status,
-                                      style: TextStyle(
-                                        color: _getStatusColor(complaints[i].status),
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 12),
-                              if (isResolvedOrRejected)
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 8),
-                                  child: Text(
-                                    complaints[i].status == 'Resolved'
-                                        ? 'This complaint is resolved.'
-                                        : 'This complaint is rejected.',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: complaints[i].status == 'Resolved'
-                                          ? Colors.green
-                                          : Colors.red,
-                                    ),
-                                  ),
-                                ),
-                              // User information
-                              FutureBuilder<String>(
-                                future: UserLookupService.getUserName(
-                                    complaints[i].studentId),
-                                builder: (context, studentSnap) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 4),
-                                  child: Text(
-                                    "Student: ${studentSnap.data ?? complaints[i].studentId}",
-                                    style: TextStyle(fontSize: 13),
-                                  ),
-                                ),
-                              ),
-                              FutureBuilder<String>(
-                                future: UserLookupService.getUserName(
-                                    complaints[i].advisorId),
-                                builder: (context, advisorSnap) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 4),
-                                  child: Text(
-                                    "Advisor: ${advisorSnap.data ?? complaints[i].advisorId}",
-                                    style: TextStyle(fontSize: 13),
-                                  ),
-                                ),
-                              ),
-                              if (complaints[i].hodId != null &&
-                                  complaints[i].hodId!.isNotEmpty)
-                                FutureBuilder<String>(
-                                  future: UserLookupService.getUserName(
-                                      complaints[i].hodId!),
-                                  builder: (context, hodSnap) => Text(
-                                    "HOD: ${hodSnap.data ?? complaints[i].hodId}",
-                                    style: TextStyle(fontSize: 13),
-                                  ),
-                                ),
-                              SizedBox(height: 8),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: IconButton(
-                                  icon: Icon(Icons.history, color: primaryColor),
-                                  onPressed: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => ComplaintHistory(
-                                          complaintId: complaints[i].id!),
-                                    ),
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                        ),
+                          if (!_showAll)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: Colors.purple.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.purple.withOpacity(0.4)),
+                                ),
+                                child: Text(
+                                  'Escalated Pending: ${escalatedComplaints.length}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.purple[800],
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          );
-        },
+                    ),
+
+                    // Complaints List
+                    Expanded(
+                      child: complaints.isEmpty
+                          ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.inbox,
+                              size: 48,
+                              color: Colors.grey.withOpacity(0.5),
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              'No complaints found',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                          : ListView.builder(
+                        padding: EdgeInsets.all(8),
+                        itemCount: complaints.length,
+                        itemBuilder: (_, i) {
+                          final isEscalated = complaints[i].status == 'Escalated to HOD';
+                          final isResolvedOrRejected = complaints[i].status == 'Resolved' ||
+                              complaints[i].status == 'Rejected';
+
+                          return Card(
+                            elevation: 2,
+                            margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(12),
+                              onTap: (!_showAll && isEscalated)
+                                  ? () => _showActions(context, complaints[i], user.id)
+                                  : null,
+                              child: Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            complaints[i].title,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: _getStatusColor(complaints[i].status)
+                                                .withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(8),
+                                            border: Border.all(
+                                              color: _getStatusColor(complaints[i].status)
+                                                  .withOpacity(0.3),
+                                            ),
+                                          ),
+                                          child: Text(
+                                            complaints[i].status,
+                                            style: TextStyle(
+                                              color: _getStatusColor(complaints[i].status),
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 12),
+                                    if (isResolvedOrRejected)
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 8),
+                                        child: Text(
+                                          complaints[i].status == 'Resolved'
+                                              ? 'This complaint is resolved.'
+                                              : 'This complaint is rejected.',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: complaints[i].status == 'Resolved'
+                                                ? Colors.green
+                                                : Colors.red,
+                                          ),
+                                        ),
+                                      ),
+                                    // User information
+                                    FutureBuilder<String>(
+                                      future: UserLookupService.getUserName(
+                                          complaints[i].studentId),
+                                      builder: (context, studentSnap) => Padding(
+                                        padding: const EdgeInsets.only(bottom: 4),
+                                        child: Text(
+                                          "Student: "+ (studentSnap.data ?? complaints[i].studentId),
+                                          style: TextStyle(fontSize: 13),
+                                        ),
+                                      ),
+                                    ),
+                                    FutureBuilder<String>(
+                                      future: UserLookupService.getUserName(
+                                          complaints[i].advisorId),
+                                      builder: (context, advisorSnap) => Padding(
+                                        padding: const EdgeInsets.only(bottom: 4),
+                                        child: Text(
+                                          "Advisor: "+ (advisorSnap.data ?? complaints[i].advisorId),
+                                          style: TextStyle(fontSize: 13),
+                                        ),
+                                      ),
+                                    ),
+                                    if (complaints[i].hodId != null &&
+                                        complaints[i].hodId!.isNotEmpty)
+                                      FutureBuilder<String>(
+                                        future: UserLookupService.getUserName(
+                                            complaints[i].hodId!),
+                                        builder: (context, hodSnap) => Text(
+                                          "HOD: "+ (hodSnap.data ?? complaints[i].hodId!),
+                                          style: TextStyle(fontSize: 13),
+                                        ),
+                                      ),
+                                    SizedBox(height: 8),
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                      child: IconButton(
+                                        icon: Icon(Icons.history, color: primaryColor),
+                                        onPressed: () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => ComplaintHistory(
+                                                complaintId: complaints[i].id!),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
       ),
     );
   }

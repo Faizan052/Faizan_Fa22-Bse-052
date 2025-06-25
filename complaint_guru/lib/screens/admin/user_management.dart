@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../models/user.dart';
 import '../../services/supabase_service.dart';
+import '../../services/batch_service.dart';
+import '../../services/department_service.dart';
+import '../../models/batch.dart';
+import '../../models/department.dart';
 
 class UserManagementScreen extends StatefulWidget {
   @override
@@ -324,8 +328,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
             ),
           ),
         ),
-      ),
-    );
+      ));
   }
 
   Widget buildFormField(TextEditingController controller, String label, {bool obscureText = false, IconData? icon, Color? mainBlue, Color? accentBlue}) {
@@ -470,29 +473,69 @@ class UserCard extends StatefulWidget {
 
 class _UserCardState extends State<UserCard> {
   bool expanded = false;
+  String? batchName;
+  String? deptName;
+  bool loadingNames = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchNames();
+  }
+
+  Future<void> _fetchNames() async {
+    setState(() => loadingNames = true);
+    String? bName;
+    String? dName;
+    try {
+      if (widget.user.batchId.isNotEmpty) {
+        final batches = await BatchService.getBatches();
+        final batch = batches.firstWhere(
+          (b) => b.id == widget.user.batchId,
+          orElse: () => Batch(id: '', name: '', departmentId: '', advisorId: ''),
+        );
+        bName = batch.id.isNotEmpty ? batch.name : null;
+      }
+      if (widget.user.departmentId.isNotEmpty) {
+        final depts = await DepartmentService.getDepartments();
+        final dept = depts.firstWhere(
+          (d) => d.id == widget.user.departmentId,
+          orElse: () => Department(id: '', name: '', hodId: ''),
+        );
+        dName = dept.id.isNotEmpty ? dept.name : null;
+      }
+    } catch (_) {}
+    setState(() {
+      batchName = bName;
+      deptName = dName;
+      loadingNames = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final Color accentBlue = const Color(0xFF1CB5E0);
     final user = widget.user;
     final Color shadowColor = accentBlue.withOpacity(0.10);
+    final Color mainBlue = const Color(0xFF4F8FFF);
 
     return Card(
-      elevation: 6,
+      elevation: 8,
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(22),
       ),
       color: Colors.white,
       shadowColor: shadowColor,
       child: InkWell(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(22),
         onTap: () => setState(() => expanded = !expanded),
         child: AnimatedContainer(
           duration: Duration(milliseconds: 220),
           curve: Curves.easeInOut,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(22),
             boxShadow: [
               BoxShadow(
                 color: shadowColor,
@@ -502,18 +545,25 @@ class _UserCardState extends State<UserCard> {
             ],
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Container(
-                      padding: EdgeInsets.all(12),
+                      padding: EdgeInsets.all(13),
                       decoration: BoxDecoration(
                         color: getRoleColor(user.role).withOpacity(0.13),
                         shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: getRoleColor(user.role).withOpacity(0.08),
+                            blurRadius: 8,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: Text(
                         user.name[0].toUpperCase(),
@@ -535,13 +585,38 @@ class _UserCardState extends State<UserCard> {
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
-                              fontSize: 18,
+                              fontSize: 19,
+                              letterSpacing: 1.1,
                             ),
+                            softWrap: true,
+                            maxLines: 2,
                           ),
-                          const SizedBox(height: 4),
-                          UserChip(
-                            label: user.role.capitalize(),
-                            color: getRoleColor(user.role),
+                          const SizedBox(height: 6),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                              decoration: BoxDecoration(
+                                color: getRoleColor(user.role),
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: getRoleColor(user.role).withOpacity(0.13),
+                                    blurRadius: 6,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Text(
+                                user.role.capitalize(),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14.5,
+                                  letterSpacing: 0.8,
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -559,7 +634,7 @@ class _UserCardState extends State<UserCard> {
                     const SizedBox(height: 14),
                     Text(
                       'Email:',
-                      style: TextStyle(fontWeight: FontWeight.w600, color: Colors.blue, fontSize: 14),
+                      style: TextStyle(fontWeight: FontWeight.w600, color: mainBlue, fontSize: 14),
                     ),
                     Text(
                       user.email,
@@ -569,21 +644,33 @@ class _UserCardState extends State<UserCard> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    if (user.batchId.isNotEmpty) ...[
-                      Text('Batch:', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.blue, fontSize: 14)),
-                      Text(user.batchId, style: TextStyle(color: accentBlue, fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 10),
-                    ],
-                    if (user.departmentId.isNotEmpty) ...[
-                      Text('Department:', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.blue, fontSize: 14)),
-                      Text(user.departmentId, style: TextStyle(color: accentBlue, fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 10),
-                    ],
+                    if (user.batchId.isNotEmpty)
+                      loadingNames
+                        ? Row(children: [SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)), SizedBox(width: 8), Text('Loading batch...')])
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Batch:', style: TextStyle(fontWeight: FontWeight.w600, color: mainBlue, fontSize: 14)),
+                              Text(batchName ?? user.batchId, style: TextStyle(color: accentBlue, fontWeight: FontWeight.w600)),
+                              const SizedBox(height: 10),
+                            ],
+                          ),
+                    if (user.departmentId.isNotEmpty)
+                      loadingNames
+                        ? Row(children: [SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)), SizedBox(width: 8), Text('Loading department...')])
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Department:', style: TextStyle(fontWeight: FontWeight.w600, color: mainBlue, fontSize: 14)),
+                              Text(deptName ?? user.departmentId, style: TextStyle(color: accentBlue, fontWeight: FontWeight.w600)),
+                              const SizedBox(height: 10),
+                            ],
+                          ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         IconButton(
-                          icon: Icon(Icons.edit_rounded, color: Colors.blue, size: 26),
+                          icon: Icon(Icons.edit_rounded, color: mainBlue, size: 26),
                           tooltip: 'Edit',
                           onPressed: widget.onEdit,
                         ),
