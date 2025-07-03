@@ -114,7 +114,7 @@ The system provides dedicated dashboards for each role (Student, HOD, Advisor, A
 
 > 📲 Download and test the app on your Android device:
 
-🔗 [Download APK](#) <!-- Replace with your actual APK URL -->
+🔗 [Download APK]([#](https://drive.google.com/file/d/1uvsLx-ZgzaA4JA_ZULHSkYYr66b_8oZW/view?usp=drive_link)) <!-- Replace with your actual APK URL -->
 
 ---
 
