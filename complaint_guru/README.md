@@ -93,4 +93,4 @@
 
 ---
 
-> Designed with ❤️ by your team.
+> Designed with ❤️ by FAIZAN.
