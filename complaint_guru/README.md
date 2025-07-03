@@ -1,6 +1,25 @@
 # Complaint_Guru
 
-## 📱 Startup
+> 🚀 A smart complaint management system designed for universities to streamline student, HOD, advisor, and admin interactions.
+
+---
+
+## 📌 Project Overview
+
+Complaint_Guru is an Android-based application designed and developed to digitize and simplify the complaint process in educational institutions.  
+Users including **Students, HODs, Batch Advisors, and Admins** can interact through dedicated dashboards to manage and resolve complaints efficiently.
+
+---
+
+## 👨‍💻 Developer
+
+**Name:** Muhammad Faizan  
+**Reg. No.:** CIIT/FA22-BSE-052/VHR  
+**Role:** Application Designer & Developer
+
+---
+
+## 📱 Startup Screens
 
 <div align="center">
   <img src="https://github.com/user-attachments/assets/c3637d67-e1bb-454a-a6a8-36e11f19b1f3" width="200"/>
@@ -8,29 +27,34 @@
   <img src="https://github.com/user-attachments/assets/763d887a-cd8d-4325-a2b6-cb8d25f97f0e" width="200"/>
 </div>
 
+> 🧾 **These are the initial launch screens that introduce the app.**
+
 ---
 
 ## 🛠️ Admin Dashboard
 
 <div align="center">
+  <!-- Row 1 -->
   <img src="https://github.com/user-attachments/assets/6f9eaff3-d748-4ba7-9a78-40a231226170" width="200"/>
   <img src="https://github.com/user-attachments/assets/568b93d3-b612-49c6-bd98-ac3c2a209fb6" width="200"/>
   <img src="https://github.com/user-attachments/assets/ea21c375-eba5-464d-bd89-14d1f176a899" width="200"/>
-  
+  <!-- Row 2 -->
   <img src="https://github.com/user-attachments/assets/68b37f8a-9ea9-47cb-8690-e586f595e755" width="200"/>
   <img src="https://github.com/user-attachments/assets/fbb01f78-c2b1-4bf6-af6d-2ce067d415f9" width="200"/>
   <img src="https://github.com/user-attachments/assets/9cd421e4-4a50-4fde-ba3c-ca38db772d32" width="200"/>
-  
+  <!-- Row 3 -->
   <img src="https://github.com/user-attachments/assets/7b75df09-3a95-49ba-b2bf-0465fd0113e9" width="200"/>
   <img src="https://github.com/user-attachments/assets/18cfb17e-3d5f-4060-b8e1-323d3add0697" width="200"/>
   <img src="https://github.com/user-attachments/assets/225f47fd-5d92-4257-ae00-1ad8fee4d86f" width="200"/>
-  
+  <!-- Row 4 -->
   <img src="https://github.com/user-attachments/assets/5413e35b-9d82-4eb9-b425-993e0c73bfa2" width="200"/>
   <img src="https://github.com/user-attachments/assets/15bc4f6e-55a2-4772-98be-3e08fd809530" width="200"/>
   <img src="https://github.com/user-attachments/assets/a2f42f07-2c3c-4f56-866d-535316d82cf3" width="200"/>
-  
+  <!-- Final -->
   <img src="https://github.com/user-attachments/assets/e5b837c7-baef-4df9-b610-515b4f004f4c" width="200"/>
 </div>
+
+> 📋 **Admin can view all submitted complaints, forward them, and monitor resolution statuses.**
 
 ---
 
@@ -45,6 +69,8 @@
   <img src="https://github.com/user-attachments/assets/818e4648-048c-4332-95c7-6627c83a8580" width="200"/>
   <img src="https://github.com/user-attachments/assets/66d372d6-a3f5-4e95-b220-5ab861db35bc" width="200"/>
 </div>
+
+> 🧩 **HOD can view department complaints and forward relevant cases to batch advisors.**
 
 ---
 
@@ -63,6 +89,8 @@
   <img src="https://github.com/user-attachments/assets/73261791-3c4a-445f-a99a-43cb4378182c" width="200"/>
 </div>
 
+> 🧑‍💼 **Batch Advisors review and take action on complaints assigned to their batch.**
+
 ---
 
 ## 🎓 Student Dashboard
@@ -79,9 +107,13 @@
   <img src="https://github.com/user-attachments/assets/56385dda-4c8f-4639-8ba9-89d85c48f2e5" width="200"/>
 </div>
 
+> 🧑‍🎓 **Students can file complaints, check statuses, and receive updates on resolutions.**
+
 ---
 
 ## 🎥 Complete App Video Tutorial
+
+> 📽️ A complete walkthrough of all app features and functionality.
 
 🔗 [Watch Full Video Tutorial](https://github.com/user-attachments/assets/2abe027c-0eca-4d1d-b808-eeeab70f1d96)
 
@@ -89,8 +121,16 @@
 
 ## 📦 APK File
 
-🔗 [Download APK](#) <!-- Replace '#' with your actual APK file URL -->
+> 📲 Download the latest APK and try it yourself!
+
+🔗 [Download APK](#) <!-- Replace '#' with your actual APK URL -->
 
 ---
 
-> Designed with ❤️ by FAIZAN.
+## 📣 Feedback
+
+If you face any issues or have suggestions, feel free to open an issue or contact the developer.
+
+---
+
+> Built with 💻 by **Muhammad Faizan (CIIT/FA22-BSE-052/VHR)** for the final year project at **COMSATS University Islamabad, Vehari Campus**.
