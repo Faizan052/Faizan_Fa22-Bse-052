@@ -1,16 +1,5 @@
 # complaint_guru
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+STARTUP:
+![WhatsApp Image 2025-07-03 at 14 45 09_5d6cf3b9](https://github.com/user-attachments/assets/11e3c9b3-6f5e-4d43-b2a0-7cbde9ceae90)
+![WhatsApp Image 2025-07-03 at 14 45 09_d90ecccd](https://github.com/user-attachments/assets/763d887a-cd8d-4325-a2b6-cb8d25f97f0e)
