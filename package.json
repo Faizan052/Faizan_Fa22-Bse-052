@@ -4,16 +4,13 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "cd client && npm install && npm run build",
-    "build:client": "cd client && npm install && npm run build",
+    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "node server.js",
     "server": "node server.js",
     "server:dev": "nodemon server.js",
     "client": "npm run dev --prefix client",
-    "dev:all": "concurrently \"npm run server:dev\" \"npm run client\"",
-    "vercel-build": "cd client && npm install && npm run build"
+    "dev:all": "concurrently \"npm run server:dev\" \"npm run client\""
   },
   "dependencies": {
     "react": "^19.2.0",
